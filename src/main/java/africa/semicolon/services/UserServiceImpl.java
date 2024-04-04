@@ -52,6 +52,7 @@ public class UserServiceImpl implements UserService {
         }
 
         user.setLoggedIn(true);
+        userRepository.save(user);
         return new LoginUserResponse(user.getId(), user.getUsername().toLowerCase());    }
 
     @Override
@@ -62,6 +63,7 @@ public class UserServiceImpl implements UserService {
             throw new UserNotFoundException("User with username " + username + " not found");
         } else {
             user.setLoggedIn(false);
+            userRepository.save(user);
             return new LogoutUserResponse(user.getId(), user.getUsername());
         }
     }
@@ -89,8 +91,9 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public boolean isUserLoggedIn(String username) {
-        User user = findUserBy(username);
-        return user != null && user.isLoggedIn();
+        String lowercaseUsername = username.toLowerCase();
+        User user = findUserBy(lowercaseUsername);
+        return user.isLoggedIn();
     }
 
 }
