@@ -7,5 +7,6 @@ public class RegisterUserResponse {
     private String id;
     private String username;
     private String dateRegistered;
+    private boolean loggedIn;
 
 }

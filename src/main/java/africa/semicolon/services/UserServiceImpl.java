@@ -51,9 +51,9 @@ public class UserServiceImpl implements UserService {
             throw new InvalidPassCodeException("Invalid password for user " + username);
         }
 
-        user.setLoggedIn(true);
+       user.setLoggedIn(true);
         userRepository.save(user);
-        return new LoginUserResponse(user.getId(), user.getUsername().toLowerCase());    }
+        return new LoginUserResponse(user.getId(), user.getUsername().toLowerCase(),user.isLoggedIn());    }
 
     @Override
     public LogoutUserResponse logout(LogoutUserRequest logoutUserRequest) {
@@ -62,9 +62,9 @@ public class UserServiceImpl implements UserService {
         if (user == null) {
             throw new UserNotFoundException("User with username " + username + " not found");
         } else {
-            user.setLoggedIn(false);
+//            user.setLoggedIn(false);
             userRepository.save(user);
-            return new LogoutUserResponse(user.getId(), user.getUsername());
+            return new LogoutUserResponse(user.getId(), user.getUsername(),false);
         }
     }
 

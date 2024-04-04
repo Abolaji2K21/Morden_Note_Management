@@ -43,6 +43,7 @@ class UserServiceImplTest {
 
         assertThat(userRepository.count(), is(0L));
         userService.register(registerRequest);
+        assertThat(userRepository.count(), is(1 ));
 
     }
 

@@ -5,15 +5,12 @@ import africa.semicolon.data.repositories.CategoryRepository;
 import africa.semicolon.data.repositories.UserRepository;
 import africa.semicolon.dtos.requests.*;
 import africa.semicolon.dtos.responds.CreateCategoryResponse;
-import africa.semicolon.dtos.responds.DeleteCategoryResponse;
-import africa.semicolon.dtos.responds.EditCategoryResponse;
 import africa.semicolon.noteException.BigNoteManagementException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
-import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
