@@ -11,7 +11,6 @@ import africa.semicolon.dtos.responds.CreateCategoryResponse;
 import africa.semicolon.dtos.responds.DeleteCategoryResponse;
 import africa.semicolon.dtos.responds.EditCategoryResponse;
 import africa.semicolon.noteException.BigNoteManagementException;
-import africa.semicolon.noteException.CategoryNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 

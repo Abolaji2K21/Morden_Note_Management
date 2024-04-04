@@ -8,6 +8,6 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface NoteRepository extends MongoRepository<Note, String> {
     Boolean existsByTitle (String note);
-    Note findByUsername(String username);
+    Note findBy(String username);
 
 }

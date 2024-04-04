@@ -12,12 +12,15 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
+import static org.bson.assertions.Assertions.assertNotNull;
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.is;
-import static org.junit.jupiter.api.Assertions.*;
+import static org.hamcrest.Matchers.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
 
 @SpringBootTest
 class UserServiceImplTest {
+
     @Autowired
     private UserService userService;
 
@@ -26,9 +29,9 @@ class UserServiceImplTest {
 
     @BeforeEach
     void setUp(){
-
         userRepository.deleteAll();
     }
+
 
     @Test
     void testThatUserCanRegister(){
@@ -82,6 +85,7 @@ class UserServiceImplTest {
 
 
     }
+
 
     @Test
     void testThatUserCanLoginAndLogoutSuccessfully() {
@@ -162,6 +166,7 @@ class UserServiceImplTest {
         assertThat(userRepository.count(), is(1L));
 
     }
+
 
 
 }

@@ -53,7 +53,7 @@ public class NoteServiceImpl implements NoteService{
 
     @Override
     public Note findNoteBy(String title) {
-        Note note = noteRepository.findByUsername(title);
+        Note note = noteRepository.findBy(title);
         if (note == null) {
             throw new NoteNotFoundExceptionException("Note not found");
         }
@@ -65,9 +65,9 @@ public class NoteServiceImpl implements NoteService{
         User user = userRepository.findByUsername(username);
         if (user == null) {
             throw new UserNotFoundException("Username not found");
-            }
-            return user;
         }
+        return user;
+    }
 
     @Override
     public DeleteNoteResponse deleteNote(DeleteNoteRequest deleteNoteRequest) {
@@ -79,8 +79,7 @@ public class NoteServiceImpl implements NoteService{
 
         noteRepository.delete(existingNote);
 
-        DeleteNoteResponse response = new DeleteNoteResponse();
-        return response;
+        return new DeleteNoteResponse();
 
     }
 
