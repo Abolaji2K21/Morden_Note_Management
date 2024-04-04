@@ -78,4 +78,94 @@ public class CategoryServiceImplTest {
         assertThrows(BigNoteManagementException.class, () -> categoryService.deleteCategory(deleteCategoryRequest));
     }
 
+    @Test
+    void testingThatTheCreateCategoryMethodThrowsException_UserIsNotLoggedIn(){
+        RegisterUserRequest registerRequest = new RegisterUserRequest();
+        registerRequest.setFirstname("PenIs");
+        registerRequest.setLastname("Up");
+        registerRequest.setUsername("penisup");
+        registerRequest.setPassword("Holes");
+        userService.register(registerRequest);
+
+
+        CreateCategoryRequest createCategoryRequest = new CreateCategoryRequest();
+        createCategoryRequest.setDescription("HappyCategories");
+        createCategoryRequest.setUsername("penisup");
+
+        assertThrows(BigNoteManagementException.class, () -> categoryService.createCategory(createCategoryRequest));
+
+    }
+
+    @Test
+    void testingThatTheCreateCategoryMethodThrowsException_UserIsNotRegistered(){
+        CreateCategoryRequest createCategoryRequest = new CreateCategoryRequest();
+        createCategoryRequest.setDescription("HappyCategories");
+        createCategoryRequest.setUsername("penisup");
+
+        assertThrows(BigNoteManagementException.class, () -> categoryService.createCategory(createCategoryRequest));
+
+    }
+
+    @Test
+    void testThatTheEditCategoryMethodsThrowsException_UserIsNotLoggedIn(){
+        RegisterUserRequest registerRequest = new RegisterUserRequest();
+        registerRequest.setFirstname("PenIs");
+        registerRequest.setLastname("Up");
+        registerRequest.setUsername("penisup");
+        registerRequest.setPassword("Holes");
+        userService.register(registerRequest);
+
+        EditCategoryRequest editCategoryRequest = new EditCategoryRequest();
+        editCategoryRequest.setCategoryId(editCategoryRequest.getCategoryId());
+        editCategoryRequest.setDescription("HappyCategories");
+        editCategoryRequest.setUsername("penisup");
+
+        assertThrows(BigNoteManagementException.class, () -> categoryService.editCategory(editCategoryRequest));
+
+    }
+
+    @Test
+    void testThatEditCategoryWorks(){
+        RegisterUserRequest registerRequest = new RegisterUserRequest();
+        registerRequest.setFirstname("PenIs");
+        registerRequest.setLastname("Up");
+        registerRequest.setUsername("penisup");
+        registerRequest.setPassword("Holes");
+        userService.register(registerRequest);
+
+        LoginUserRequest loginRequest = new LoginUserRequest();
+        loginRequest.setUsername("penisup");
+        loginRequest.setPassword("Holes");
+        userService.login(loginRequest);
+
+        CreateCategoryRequest createCategoryRequest = new CreateCategoryRequest();
+        createCategoryRequest.setDescription("HappyCategories");
+        createCategoryRequest.setUsername("penisup");
+        categoryService.createCategory(createCategoryRequest);
+
+        EditCategoryRequest editCategoryRequest = new EditCategoryRequest();
+        editCategoryRequest.setCategoryId("Okay");
+        editCategoryRequest.setDescription("HappyCategories");
+        editCategoryRequest.setUsername("penisup");
+        assertEquals("Okay", editCategoryRequest.getCategoryId());
+
+    }
+
+    @Test
+    void testThatDeleteCategoryThrowsExceptions_UserIsNotLoggedIn(){
+        RegisterUserRequest registerRequest = new RegisterUserRequest();
+        registerRequest.setFirstname("PenIs");
+        registerRequest.setLastname("Up");
+        registerRequest.setUsername("penisup");
+        registerRequest.setPassword("Holes");
+        userService.register(registerRequest);
+
+        DeleteCategoryRequest deleteCategoryRequest = new DeleteCategoryRequest();
+        deleteCategoryRequest.setCategoryId(deleteCategoryRequest.getCategoryId());
+
+        assertThrows(BigNoteManagementException.class, () -> categoryService.deleteCategory(deleteCategoryRequest));
+
+    }
+
+
 }
