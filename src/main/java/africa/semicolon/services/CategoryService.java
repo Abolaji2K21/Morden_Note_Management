@@ -16,7 +16,7 @@ public interface CategoryService {
 
     Category findCategoryById(String categoryId);
 
-    EditCategoryResponse editCategory(String categoryId, EditCategoryRequest editCategoryRequest);
+    EditCategoryResponse editCategory(EditCategoryRequest editCategoryRequest);
 
     DeleteCategoryResponse deleteCategory(DeleteCategoryRequest deleteCategoryRequest);
 
@@ -24,7 +24,7 @@ public interface CategoryService {
 
     List<Note> getNotesByCategoryId(String categoryId);
 
-    void addNoteToCategory(String categoryId, String noteId);
+    void addNoteToCategory(String username,String categoryId, String noteId);
 
-    void removeNoteFromCategory(String categoryId, String noteId);
+    void removeNoteFromCategory(String username,String categoryId, String noteId);
 }

@@ -6,4 +6,5 @@ import lombok.Data;
 public class EditCategoryRequest {
     private String description;
     private String username;
+    private String categoryId;
 }

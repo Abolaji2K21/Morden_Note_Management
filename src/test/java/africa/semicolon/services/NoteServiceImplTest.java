@@ -222,4 +222,30 @@ public class NoteServiceImplTest {
 //        assertNull(noteRepository.findBy("AboutHoles"));
     }
 
+    @Test
+    void testThatAnotherUserCanNotDeleteAnotherUserNote(){
+        RegisterUserRequest registerRequest = new RegisterUserRequest();
+        registerRequest.setFirstname("PenIs");
+        registerRequest.setLastname("Up");
+        registerRequest.setUsername("penisup");
+        registerRequest.setPassword("Holes");
+        userService.register(registerRequest);
+
+        LoginUserRequest loginRequest = new LoginUserRequest();
+        loginRequest.setUsername("penisup");
+        loginRequest.setPassword("Holes");
+        userService.login(loginRequest);
+
+        CreateNoteRequest createNoteRequest = new CreateNoteRequest();
+        createNoteRequest.setUsername("penisup");
+        createNoteRequest.setTitle("AboutHoles");
+        createNoteRequest.setContent("What to do when the hole is right");
+        noteService.writeNote(createNoteRequest);
+
+        DeleteNoteRequest deleteNoteRequest = new DeleteNoteRequest();
+        deleteNoteRequest.setUsername("penisDown");
+        deleteNoteRequest.setTitle("AboutHoles");
+        assertThrows(BigNoteManagementException.class, () -> noteService.deleteNote(deleteNoteRequest));
+
+    }
 }
