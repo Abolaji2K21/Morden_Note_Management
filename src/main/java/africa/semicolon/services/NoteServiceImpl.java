@@ -32,18 +32,35 @@ public class NoteServiceImpl implements NoteService {
 
     @Override
     public CreateNoteResponse writeNote(CreateNoteRequest createNoteRequest) {
-        checkStatus(createNoteRequest.getUsername());
+        String username = createNoteRequest.getUsername();
+        if (!userService.isUserRegistered(username)) {
+            throw new BigNoteManagementException("User with username " + username + " is not registered");
+        }
 
-        Note newNote = map(createNoteRequest);
+        if (!userService.isUserLoggedIn(username)) {
+
+            throw new BigNoteManagementException("User with username " + username + " is not logged in");
+        }
+            User user = findUserBy(username);
+
+
+            Note newNote = map(createNoteRequest);
             validate(createNoteRequest);
+            newNote.setUserId(user.getId());
             Note savedNote = noteRepository.save(newNote);
             return map(savedNote);
     }
 
     @Override
     public EditNoteResponse editNote(EditNoteRequest editNoteRequest) {
-        checkStatus(editNoteRequest.getUsername());
+        String username = editNoteRequest.getUsername();
+        if (!userService.isUserRegistered(username)) {
+            throw new BigNoteManagementException("User with username " + username + " is not registered");
+        }
 
+        if (!userService.isUserLoggedIn(username)) {
+            throw new BigNoteManagementException("User with username " + username + " is not logged in");
+        }
         Note existingNote = findNoteBy(editNoteRequest.getTitle());
         User user = findUserBy(editNoteRequest.getUsername());
         if (!existingNote.getUserId().equals(user.getId())) {
@@ -56,26 +73,27 @@ public class NoteServiceImpl implements NoteService {
         return mapEditNoteResponse(updatedNote);
     }
 
-    private void checkStatus(String editNoteRequest) {
-        String username = editNoteRequest;
-        if (!userService.isUserRegistered(username)) {
-            throw new BigNoteManagementException("User with username " + username + " is not registered");
-        }
+//    private void checkStatus(String editNoteRequest) {
+//        String username = editNoteRequest;
+//        if (!userService.isUserRegistered(username)) {
+//            throw new BigNoteManagementException("User with username " + username + " is not registered");
+//        }
+//
+//        if (!userService.isUserLoggedIn(username)) {
+//            throw new BigNoteManagementException("User with username " + username + " is not logged in");
+//        }
+//    }
 
-        if (!userService.isUserLoggedIn(username)) {
-            throw new BigNoteManagementException("User with username " + username + " is not logged in");
-        }
-    }
 
-
-    @Override
-    public Note findNoteBy(String title) {
-        Note note = noteRepository.findBy(title);
+    public Note findNoteBy(String username) {
+        Note note = noteRepository.findBy(username);
         if (note == null) {
-            throw new NoteNotFoundExceptionException("Note not found");
+            throw new NoteNotFoundExceptionException("Note not found for" +
+                    " user: " + username);
         }
         return note;
     }
+
 
     @Override
     public User findUserBy(String username) {
@@ -88,8 +106,14 @@ public class NoteServiceImpl implements NoteService {
 
     @Override
     public DeleteNoteResponse deleteNote(DeleteNoteRequest deleteNoteRequest) {
-        checkStatus(deleteNoteRequest.getUsername());
-        Note existingNote = findNoteBy(deleteNoteRequest.getTitle());
+        String username = deleteNoteRequest.getUsername();
+        if (!userService.isUserRegistered(username)) {
+            throw new BigNoteManagementException("User with username " + username + " is not registered");
+        }
+
+        if (!userService.isUserLoggedIn(username)) {
+            throw new BigNoteManagementException("User with username " + username + " is not logged in");
+        }        Note existingNote = findNoteBy(deleteNoteRequest.getTitle());
         User user = findUserBy(deleteNoteRequest.getUsername());
         if (!existingNote.getUserId().equals(user.getId())) {
             throw new UserNotFoundException("You are not authorized to delete this note");
@@ -100,7 +124,6 @@ public class NoteServiceImpl implements NoteService {
         return new DeleteNoteResponse();
 
     }
-
 
     private void validate(CreateNoteRequest createNoteRequest) {
         String username = createNoteRequest.getUsername();
