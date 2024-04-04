@@ -48,7 +48,7 @@ public class NoteServiceImplTest {
     }
 
     @Test
-    public void testingTheWriteNoteMethodWhen_UserIsRegistered() {
+    public void testingTheWriteNoteMethodWhen_UserIsRegisteredButNotLoggedIn() {
         RegisterUserRequest registerRequest = new RegisterUserRequest();
         registerRequest.setFirstname("PenIs");
         registerRequest.setLastname("Up");
@@ -57,12 +57,14 @@ public class NoteServiceImplTest {
         userService.register(registerRequest);
 
         CreateNoteRequest createNoteRequest = new CreateNoteRequest();
-        createNoteRequest.setUsername("PenIsUp");
+        createNoteRequest.setUsername("penisup");
         createNoteRequest.setTitle("AboutHoles");
         createNoteRequest.setContent("What to do when the hole is right");
-        noteService.writeNote(createNoteRequest);
-        Note savedNote = noteRepository.findBy("AboutHoles");
-        assertEquals("AboutHoles", savedNote.getTitle());
+        assertThrows(BigNoteManagementException.class, () -> noteService.writeNote(createNoteRequest));
+
+//        noteService.writeNote(createNoteRequest);
+//        Note savedNote = noteRepository.findBy("AboutHoles");
+//        assertEquals("AboutHoles", savedNote.getTitle());
 
 
 

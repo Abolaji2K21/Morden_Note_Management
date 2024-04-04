@@ -16,26 +16,34 @@ import africa.semicolon.noteException.UserNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.Optional;
+
 import static africa.semicolon.utils.Mapper.*;
 
 @Service
-public class NoteServiceImpl implements NoteService{
+public class NoteServiceImpl implements NoteService {
 
     @Autowired
     private NoteRepository noteRepository;
     @Autowired
     private UserRepository userRepository;
+    @Autowired
+    private UserService userService;
 
     @Override
     public CreateNoteResponse writeNote(CreateNoteRequest createNoteRequest) {
+        checkStatus(createNoteRequest.getUsername());
+
         Note newNote = map(createNoteRequest);
-        validate(createNoteRequest);
-        Note savedNote = noteRepository.save(newNote);
-        return map(savedNote);
+            validate(createNoteRequest);
+            Note savedNote = noteRepository.save(newNote);
+            return map(savedNote);
     }
 
     @Override
     public EditNoteResponse editNote(EditNoteRequest editNoteRequest) {
+        checkStatus(editNoteRequest.getUsername());
+
         Note existingNote = findNoteBy(editNoteRequest.getTitle());
         User user = findUserBy(editNoteRequest.getUsername());
         if (!existingNote.getUserId().equals(user.getId())) {
@@ -48,7 +56,16 @@ public class NoteServiceImpl implements NoteService{
         return mapEditNoteResponse(updatedNote);
     }
 
+    private void checkStatus(String editNoteRequest) {
+        String username = editNoteRequest;
+        if (!userService.isUserRegistered(username)) {
+            throw new BigNoteManagementException("User with username " + username + " is not registered");
+        }
 
+        if (!userService.isUserLoggedIn(username)) {
+            throw new BigNoteManagementException("User with username " + username + " is not logged in");
+        }
+    }
 
 
     @Override
@@ -71,6 +88,7 @@ public class NoteServiceImpl implements NoteService{
 
     @Override
     public DeleteNoteResponse deleteNote(DeleteNoteRequest deleteNoteRequest) {
+        checkStatus(deleteNoteRequest.getUsername());
         Note existingNote = findNoteBy(deleteNoteRequest.getTitle());
         User user = findUserBy(deleteNoteRequest.getUsername());
         if (!existingNote.getUserId().equals(user.getId())) {
@@ -92,6 +110,5 @@ public class NoteServiceImpl implements NoteService{
             throw new BigNoteManagementException("Note already exists1");
         }
     }
-
 
 }

@@ -1,5 +1,6 @@
 package africa.semicolon.services;
 
+import africa.semicolon.noteException.BigNoteManagementException;
 import africa.semicolon.noteException.InvalidPassCodeException;
 import africa.semicolon.noteException.UserExistsException;
 import africa.semicolon.noteException.UserNotFoundException;
@@ -11,7 +12,6 @@ import africa.semicolon.dtos.responds.LoginUserResponse;
 import africa.semicolon.dtos.responds.LogoutUserResponse;
 import africa.semicolon.dtos.responds.RegisterUserResponse;
 import africa.semicolon.data.repositories.UserRepository;
-import africa.semicolon.utils.Mapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -51,6 +51,7 @@ public class UserServiceImpl implements UserService {
             throw new InvalidPassCodeException("Invalid password for user " + username);
         }
 
+        user.setLoggedIn(true);
         return new LoginUserResponse(user.getId(), user.getUsername().toLowerCase());    }
 
     @Override
@@ -60,6 +61,7 @@ public class UserServiceImpl implements UserService {
         if (user == null) {
             throw new UserNotFoundException("User with username " + username + " not found");
         } else {
+            user.setLoggedIn(false);
             return new LogoutUserResponse(user.getId(), user.getUsername());
         }
     }
@@ -78,4 +80,17 @@ public class UserServiceImpl implements UserService {
         boolean userExists = userRepository.existsByUsername(username);
         if (userExists) throw new UserExistsException(String.format("%s already exists", username));
     }
+
+
+    @Override
+    public boolean isUserRegistered(String username) {
+        return userRepository.existsByUsername(username);
+    }
+
+    @Override
+    public boolean isUserLoggedIn(String username) {
+        User user = findUserBy(username);
+        return user != null && user.isLoggedIn();
+    }
+
 }

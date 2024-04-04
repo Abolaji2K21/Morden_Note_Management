@@ -7,6 +7,7 @@ import africa.semicolon.data.model.User;
 import africa.semicolon.dtos.requests.CreateNoteRequest;
 import africa.semicolon.dtos.requests.DeleteNoteRequest;
 import africa.semicolon.dtos.requests.EditNoteRequest;
+import africa.semicolon.dtos.requests.LoginUserRequest;
 import africa.semicolon.dtos.responds.CreateNoteResponse;
 import africa.semicolon.dtos.responds.DeleteNoteResponse;
 import africa.semicolon.dtos.responds.EditNoteResponse;

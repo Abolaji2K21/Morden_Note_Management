@@ -21,6 +21,7 @@ public class User {
     private String username;
     private String password;
     private LocalDateTime dateCreated = LocalDateTime.now();
+    private boolean loggedIn;
 
 
     @Override
