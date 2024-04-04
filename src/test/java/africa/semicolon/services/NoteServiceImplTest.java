@@ -5,10 +5,12 @@ import africa.semicolon.data.model.User;
 import africa.semicolon.data.repositories.NoteRepository;
 import africa.semicolon.data.repositories.UserRepository;
 import africa.semicolon.dtos.requests.CreateNoteRequest;
+import africa.semicolon.dtos.requests.EditNoteRequest;
 import africa.semicolon.dtos.requests.LoginUserRequest;
 import africa.semicolon.dtos.requests.RegisterUserRequest;
 import africa.semicolon.dtos.responds.LoginUserResponse;
 import africa.semicolon.noteException.BigNoteManagementException;
+import africa.semicolon.noteException.UserNotFoundException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -34,7 +36,7 @@ public class NoteServiceImplTest {
     private UserService userService;
 
     @BeforeEach
-    void setUp(){
+    void setUp() {
 
         userRepository.deleteAll();
         noteRepository.deleteAll();
@@ -68,6 +70,7 @@ public class NoteServiceImplTest {
 
 
     }
+
     @Test
     public void testingTheWriteNoteMethodWhen_UserIsRegisteredAndLoggedIn() {
         RegisterUserRequest registerRequest = new RegisterUserRequest();
@@ -95,7 +98,77 @@ public class NoteServiceImplTest {
 
     }
 
+    @Test
+    public void testingTheEditNoteMethodWhen_UserIsNotRegistered() {
+        CreateNoteRequest createNoteRequest = new CreateNoteRequest();
+        createNoteRequest.setUsername("penisup");
+        createNoteRequest.setTitle("AboutHoles");
+        createNoteRequest.setContent("What to do when the hole is right");
+
+        EditNoteRequest editNoteRequest = new EditNoteRequest();
+        editNoteRequest.setUsername("penisup");
+        editNoteRequest.setTitle("AboutHoles");
+        editNoteRequest.setContent("What to do when the hole is right");
+        assertThrows(BigNoteManagementException.class, () -> noteService.editNote(editNoteRequest));
+
+    }
+
+    @Test
+    public void testingTheWEditNoteMethodWhen_UserIsRegisteredAndLoggedIn() {
+        RegisterUserRequest registerRequest = new RegisterUserRequest();
+        registerRequest.setFirstname("PenIs");
+        registerRequest.setLastname("Up");
+        registerRequest.setUsername("PenIsUp");
+        registerRequest.setPassword("Holes");
+        userService.register(registerRequest);
+
+        CreateNoteRequest createNoteRequest = new CreateNoteRequest();
+        createNoteRequest.setUsername("penisup");
+        createNoteRequest.setTitle("AboutHoles");
+        createNoteRequest.setContent("What to do when the hole is right");
+
+        EditNoteRequest editNoteRequest = new EditNoteRequest();
+        editNoteRequest.setUsername("penisup");
+        editNoteRequest.setTitle("AboutHoles");
+        editNoteRequest.setContent("What to do when the hole is right");
+
+        assertThrows(BigNoteManagementException.class, () -> noteService.editNote(editNoteRequest));
+
+    }
+
+    @Test
+    public void testingTheEditNoteMethodWhen_UserIsRegisteredAndLoggedIn() {
+        RegisterUserRequest registerRequest = new RegisterUserRequest();
+        registerRequest.setFirstname("PenIs");
+        registerRequest.setLastname("Up");
+        registerRequest.setUsername("penisup");
+        registerRequest.setPassword("Holes");
+        userService.register(registerRequest);
+
+        LoginUserRequest loginRequest = new LoginUserRequest();
+        loginRequest.setUsername("penisup");
+        loginRequest.setPassword("Holes");
+        userService.login(loginRequest);
 
 
+        CreateNoteRequest createNoteRequest = new CreateNoteRequest();
+        createNoteRequest.setUsername("penisup");
+        createNoteRequest.setTitle("AboutHoles");
+        createNoteRequest.setContent("What to do when the hole is right");
+        noteService.writeNote(createNoteRequest);
+
+        EditNoteRequest editNoteRequest = new EditNoteRequest();
+        editNoteRequest.setUsername("penisup");
+        editNoteRequest.setTitle("AboutHoles");
+        editNoteRequest.setContent("Call the police");
+
+        noteService.editNote(editNoteRequest);
+
+        Note editedNote = noteRepository.findBy("AboutHoles");
+
+        assertEquals("Call the police", editedNote.getContent());
+
+
+
+    }
 }
-
