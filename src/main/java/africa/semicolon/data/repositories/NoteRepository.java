@@ -7,7 +7,7 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface NoteRepository extends MongoRepository<Note, String> {
-    Boolean existsByTitle (String note);
+    Boolean existsBy(String Username, String Title);
     Note findBy(String username);
 
 }

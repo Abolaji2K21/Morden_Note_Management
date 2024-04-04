@@ -29,8 +29,8 @@ public class NoteServiceImpl implements NoteService{
     @Override
     public CreateNoteResponse writeNote(CreateNoteRequest createNoteRequest) {
         Note newNote = map(createNoteRequest);
+        validate(createNoteRequest);
         Note savedNote = noteRepository.save(newNote);
-        Validate(createNoteRequest);
         return map(savedNote);
     }
 
@@ -84,9 +84,14 @@ public class NoteServiceImpl implements NoteService{
     }
 
 
-    private void Validate(CreateNoteRequest createNoteRequest) {
-        boolean userExists = noteRepository.existsByTitle(createNoteRequest.getTitle());
-        if (userExists) throw new BigNoteManagementException("Note already exists");
+    private void validate(CreateNoteRequest createNoteRequest) {
+        String username = createNoteRequest.getUsername();
+        String noteTitle = createNoteRequest.getTitle();
+        boolean noteExistsForUser = noteRepository.existsBy(username, noteTitle);
+        if (noteExistsForUser) {
+            throw new BigNoteManagementException("Note already exists1");
+        }
     }
+
 
 }
