@@ -1,5 +1,8 @@
 package africa.semicolon.services;
 
+import java.util.List;
+import java.util.Optional;
+
 import africa.semicolon.data.model.Category;
 import africa.semicolon.data.model.Note;
 import africa.semicolon.data.repositories.CategoryRepository;
@@ -15,8 +18,8 @@ import africa.semicolon.noteException.UserNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
-import java.util.Optional;
+import static africa.semicolon.utils.Mapper.mapToCreateCategoryResponse;
+import static africa.semicolon.utils.Mapper.mapToEditCategoryResponse;
 
 @Service
 public class CategoryServiceImpl implements CategoryService {
@@ -33,14 +36,7 @@ public class CategoryServiceImpl implements CategoryService {
     @Override
     public CreateCategoryResponse createCategory(CreateCategoryRequest createCategoryRequest) {
         String username = createCategoryRequest.getUsername();
-
-        if (!userService.isUserRegistered(username)) {
-            throw new BigNoteManagementException("User with username " + username + " is not registered");
-        }
-
-        if (!userService.isUserLoggedIn(username)) {
-            throw new BigNoteManagementException("User with username " + username + " is not logged in");
-        }
+        validateUser(username);
 
         Category category = new Category();
         category.setDescription(createCategoryRequest.getDescription());
@@ -48,60 +44,42 @@ public class CategoryServiceImpl implements CategoryService {
 
         Category savedCategory = categoryRepository.save(category);
 
-        CreateCategoryResponse response = new CreateCategoryResponse();
-        response.setId(savedCategory.getId());
-        response.setDescription(savedCategory.getDescription());
-        response.setUsername(savedCategory.getUsername());
-        return response;
-    }
+        Note note = new Note();
+        note.setTitle(note.getTitle());
+        note.setContent(note.getContent());
+        note.setCategory(savedCategory);
 
-    @Override
-    public Category findCategoryById(String categoryId) {
-        Optional<Category> optionalCategory = categoryRepository.findById(categoryId);
-        return optionalCategory.orElseThrow(() -> new BigNoteManagementException("Category not found with ID: " + categoryId));
-    }
+        noteRepository.save(note);
 
+
+        return mapToCreateCategoryResponse(savedCategory);
+    }
 
     @Override
     public EditCategoryResponse editCategory(EditCategoryRequest editCategoryRequest) {
-        String categoryId = editCategoryRequest.getCategoryId();
+        String description = editCategoryRequest.getDescription();
         String username = editCategoryRequest.getUsername();
+        validateUser(username);
 
-        if (!userService.isUserRegistered(username)) {
-            throw new BigNoteManagementException("User with username " + username + " is not registered");
-        }
+        Category existingCategory = getCategoryByDescription(description);
 
-        if (!userService.isUserLoggedIn(username)) {
-            throw new BigNoteManagementException("User with username " + username + " is not logged in");
-        }
-
-        Category existingCategory = findCategoryById(categoryId);
-
-        existingCategory.setDescription(editCategoryRequest.getDescription());
         existingCategory.setUsername(username);
+
+        if (!existingCategory.getDescription().equals(description)) {
+            existingCategory.setDescription(description);
+        }
 
         Category updatedCategory = categoryRepository.save(existingCategory);
 
-        EditCategoryResponse response = new EditCategoryResponse();
-        response.setId(updatedCategory.getId());
-        response.setDescription(updatedCategory.getDescription());
-        response.setUsername(updatedCategory.getUsername());
-        return response;
+        return mapToEditCategoryResponse(updatedCategory);
     }
 
     @Override
     public DeleteCategoryResponse deleteCategory(DeleteCategoryRequest deleteCategoryRequest) {
         String username = deleteCategoryRequest.getUsername();
+        validateUser(username);
 
-        if (!userService.isUserRegistered(username)) {
-            throw new BigNoteManagementException("User with username " + username + " is not registered");
-        }
-
-        if (!userService.isUserLoggedIn(username)) {
-            throw new BigNoteManagementException("User with username " + username + " is not logged in");
-        }
-
-        Category existingCategory = findCategoryById(deleteCategoryRequest.getCategoryId());
+        Category existingCategory = getCategoryByDescription(deleteCategoryRequest.getDescription());
 
         if (!existingCategory.getUsername().equals(username)) {
             throw new UserNotFoundException("User with username " + username + " is not authorized to delete this category");
@@ -117,24 +95,19 @@ public class CategoryServiceImpl implements CategoryService {
     }
 
     @Override
-    public List<Note> getNotesByCategoryId(String categoryId) {
-        Category category = findCategoryById(categoryId);
+    public List<Note> getNotesByCategoryDescription(String description) {
+        Category category = getCategoryByDescription(description);
         return category.getNotes();
     }
 
-    @Override
-    public void addNoteToCategory(String username,String categoryId, String noteId) {
-        if (!userService.isUserRegistered(username)) {
-            throw new BigNoteManagementException("User with username " + username + " is not registered");
-        }
+    public void addNoteToCategory(String username, String description, Note note) {
+        validateUser(username);
 
-        if (!userService.isUserLoggedIn(username)) {
-            throw new BigNoteManagementException("User with username " + username + " is not logged in");
-        }
+        Category category = getCategoryByDescription(description);
 
-        Category category = findCategoryById(categoryId);
-        Note note = noteRepository.findById(noteId)
-                .orElseThrow(() -> new BigNoteManagementException("Note not found"));
+        if (note.getId() == null) {
+            note = noteRepository.save(note);
+        }
 
         category.getNotes().add(note);
 
@@ -142,8 +115,17 @@ public class CategoryServiceImpl implements CategoryService {
     }
 
     @Override
-    public void removeNoteFromCategory(String username,String categoryId, String noteId) {
+    public void removeNoteFromCategory(String username, String description, Note note) {
+        validateUser(username);
 
+        Category category = getCategoryByDescription(description);
+
+        category.getNotes().removeIf(n -> n.getId().equals(note.getId()));
+
+        categoryRepository.save(category);
+    }
+
+    private void validateUser(String username) {
         if (!userService.isUserRegistered(username)) {
             throw new BigNoteManagementException("User with username " + username + " is not registered");
         }
@@ -151,11 +133,21 @@ public class CategoryServiceImpl implements CategoryService {
         if (!userService.isUserLoggedIn(username)) {
             throw new BigNoteManagementException("User with username " + username + " is not logged in");
         }
-
-        Category category = findCategoryById(categoryId);
-
-        category.getNotes().removeIf(note -> note.getId().equals(noteId));
-
-        categoryRepository.save(category);
     }
+
+//    private Category getCategoryById(String categoryId) {
+//        Optional<Category> optionalCategory = categoryRepository.findById(categoryId);
+//        return optionalCategory.orElseThrow(() -> new BigNoteManagementException("Category not found with ID: " + categoryId));
+//    }
+
+    private Category getCategoryByDescription(String description) {
+        Optional<Category> optionalCategory = categoryRepository.findByDescription(description);
+        return optionalCategory.orElseThrow(() -> new BigNoteManagementException("Category not found with description: " + description));
+    }
+
+//    private Note getNoteById(String noteId) {
+//        return noteRepository.findById(noteId)
+//                .orElseThrow(() -> new BigNoteManagementException("Note not found with ID: " + noteId));
+//    }
+
 }

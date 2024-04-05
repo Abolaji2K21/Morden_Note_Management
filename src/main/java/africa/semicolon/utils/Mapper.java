@@ -1,13 +1,12 @@
 package africa.semicolon.utils;
 
+import africa.semicolon.data.model.Category;
 import africa.semicolon.data.model.Note;
 import africa.semicolon.data.model.User;
 import africa.semicolon.dtos.requests.CreateNoteRequest;
 import africa.semicolon.dtos.requests.EditNoteRequest;
 import africa.semicolon.dtos.requests.RegisterUserRequest;
-import africa.semicolon.dtos.responds.CreateNoteResponse;
-import africa.semicolon.dtos.responds.EditNoteResponse;
-import africa.semicolon.dtos.responds.RegisterUserResponse;
+import africa.semicolon.dtos.responds.*;
 
 import java.time.format.DateTimeFormatter;
 
@@ -52,6 +51,21 @@ public class Mapper {
         EditNoteResponse response = new EditNoteResponse();
         response.setNewTitle(updatedNote.getTitle());
         response.setNewContent(updatedNote.getContent());
+        return response;
+    }
+    public static CreateCategoryResponse mapToCreateCategoryResponse(Category category) {
+        CreateCategoryResponse response = new CreateCategoryResponse();
+        response.setId(category.getId());
+        response.setDescription(category.getDescription());
+        response.setUsername(category.getUsername());
+        return response;
+    }
+
+    public static EditCategoryResponse mapToEditCategoryResponse(Category category) {
+        EditCategoryResponse response = new EditCategoryResponse();
+        response.setId(category.getId());
+        response.setDescription(category.getDescription());
+        response.setUsername(category.getUsername());
         return response;
     }
 }

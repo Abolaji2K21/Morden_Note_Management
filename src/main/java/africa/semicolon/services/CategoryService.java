@@ -14,17 +14,15 @@ import java.util.List;
 public interface CategoryService {
     CreateCategoryResponse createCategory(CreateCategoryRequest createCategoryRequest);
 
-    Category findCategoryById(String categoryId);
-
     EditCategoryResponse editCategory(EditCategoryRequest editCategoryRequest);
 
     DeleteCategoryResponse deleteCategory(DeleteCategoryRequest deleteCategoryRequest);
 
     List<Category> getAllCategories();
 
-    List<Note> getNotesByCategoryId(String categoryId);
+    List<Note> getNotesByCategoryDescription(String description);
 
-    void addNoteToCategory(String username,String categoryId, String noteId);
+    void addNoteToCategory(String username,String categoryId, Note note);
 
-    void removeNoteFromCategory(String username,String categoryId, String noteId);
+    void removeNoteFromCategory(String username,String categoryId, Note note);
 }

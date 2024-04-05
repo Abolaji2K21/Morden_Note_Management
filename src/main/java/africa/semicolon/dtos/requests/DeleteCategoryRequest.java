@@ -5,6 +5,7 @@ import lombok.Data;
 
 @Data
 public class DeleteCategoryRequest {
-    private String categoryId;
+    private String description ;
     private String username;
+
 }
