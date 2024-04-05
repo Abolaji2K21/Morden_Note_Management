@@ -14,6 +14,8 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
+import java.util.List;
+
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.MatcherAssert.*;
 
@@ -204,16 +206,119 @@ public class CategoryServiceImplTest {
         assertEquals("penisup", categoryResponse.getUsername());
         assertTrue(categoryRepository.findById(categoryResponse.getId()).isPresent());
 
-        Category category = categoryRepository.findByDescription("HappyCategories")
-                .orElseThrow(() -> new BigNoteManagementException("Category not found"));
-
-
-//        Category category = categoryRepository.findByDescription("HappyCategories").get();
+        Category category = categoryRepository.findByDescription("HappyCategories").get();
         assertTrue(category.getNotes().contains(note));
 
     }
+    @Test
+    void testRemoveNoteFromCategory() {
+        RegisterUserRequest registerRequest = new RegisterUserRequest();
+        registerRequest.setFirstname("PenIs");
+        registerRequest.setLastname("Up");
+        registerRequest.setUsername("penisup");
+        registerRequest.setPassword("Holes");
+        userService.register(registerRequest);
+
+        LoginUserRequest loginRequest = new LoginUserRequest();
+        loginRequest.setUsername("penisup");
+        loginRequest.setPassword("Holes");
+        userService.login(loginRequest);
+
+        CreateCategoryRequest createCategoryRequest = new CreateCategoryRequest();
+        createCategoryRequest.setDescription("HappyCategories");
+        createCategoryRequest.setUsername("penisup");
+        CreateCategoryResponse categoryResponse = categoryService.createCategory(createCategoryRequest);
+
+        Note note = new Note();
+        note.setTitle("AboutHoles");
+        note.setContent("What to do when the hole is right");
+
+        categoryService.addNoteToCategory("penisup", categoryResponse.getDescription(), note);
+
+        categoryService.removeNoteFromCategory("penisup", categoryResponse.getDescription(), note);
+
+        Category category = categoryRepository.findByDescription("HappyCategories").orElseThrow(() -> new RuntimeException("Category not found"));
+        assertFalse(category.getNotes().contains(note));
+    }
 
 
+    @Test
+    void testGetNotesByCategoryDescription() {
+        RegisterUserRequest registerRequest = new RegisterUserRequest();
+        registerRequest.setFirstname("PenIs");
+        registerRequest.setLastname("Up");
+        registerRequest.setUsername("penisup");
+        registerRequest.setPassword("Holes");
+        userService.register(registerRequest);
 
+        LoginUserRequest loginRequest = new LoginUserRequest();
+        loginRequest.setUsername("penisup");
+        loginRequest.setPassword("Holes");
+        userService.login(loginRequest);
+
+        CreateCategoryRequest createCategoryRequest = new CreateCategoryRequest();
+        createCategoryRequest.setDescription("HappyCategories");
+        createCategoryRequest.setUsername("penisup");
+        CreateCategoryResponse categoryResponse = categoryService.createCategory(createCategoryRequest);
+
+        Note note1 = new Note();
+        note1.setTitle("Note1");
+        note1.setContent("Content1");
+
+        Note note2 = new Note();
+        note2.setTitle("Note2");
+        note2.setContent("Content2");
+
+        categoryService.addNoteToCategory("penisup", categoryResponse.getDescription(), note1);
+        categoryService.addNoteToCategory("penisup", categoryResponse.getDescription(), note2);
+
+        List<Note> notes = categoryService.getNotesByCategoryDescription(categoryResponse.getDescription());
+        assertEquals(2, notes.size());
+        assertTrue(notes.contains(note1));
+        assertTrue(notes.contains(note2));
+    }
+
+    @Test
+    void testGetAllCategories() {
+        RegisterUserRequest registerRequest = new RegisterUserRequest();
+        registerRequest.setFirstname("PenIs");
+        registerRequest.setLastname("Up");
+        registerRequest.setUsername("penisup");
+        registerRequest.setPassword("Holes");
+        userService.register(registerRequest);
+
+        LoginUserRequest loginRequest = new LoginUserRequest();
+        loginRequest.setUsername("penisup");
+        loginRequest.setPassword("Holes");
+        userService.login(loginRequest);
+
+        CreateCategoryRequest createCategoryRequest1 = new CreateCategoryRequest();
+        createCategoryRequest1.setDescription("Category1");
+        createCategoryRequest1.setUsername("penisup");
+        CreateCategoryResponse categoryResponse1 = categoryService.createCategory(createCategoryRequest1);
+
+        CreateCategoryRequest createCategoryRequest2 = new CreateCategoryRequest();
+        createCategoryRequest2.setDescription("Category2");
+        createCategoryRequest2.setUsername("penisup");
+        CreateCategoryResponse categoryResponse2 = categoryService.createCategory(createCategoryRequest2);
+
+        assertEquals(2, categoryService.getAllCategories().size());
+
+//        boolean category1Found = false;
+//        boolean category2Found = false;
+//
+//        for (Category category : categories) {
+//            if (category.getDescription().equals(categoryResponse1.getDescription())) {
+//                category1Found = true;
+//            }
+//            if (category.getDescription().equals(categoryResponse2.getDescription())) {
+//                category2Found = true;
+//            }
+//        }
+//
+//        assertTrue(category1Found);
+//        assertTrue(category2Found);
+//    }
+    }
 
 }
