@@ -23,7 +23,7 @@ public class UserController {
     private UserService userService;
 
 
-    @PostMapping
+    @PostMapping("/sign up")
     public ResponseEntity<?> registerUser(@RequestBody RegisterUserRequest registerUserRequest) {
         try{
            RegisterUserResponse result = userService.register(registerUserRequest);
