@@ -79,6 +79,9 @@ public class UserServiceImpl implements UserService {
 
 
     private void validate(String username) {
+        if (username == null || username.isEmpty()) {
+            throw new BigNoteManagementException("Username cannot be null or empty");
+        }
         boolean userExists = userRepository.existsByUsername(username);
         if (userExists) throw new UserExistsException(String.format("%s already exists", username));
     }
