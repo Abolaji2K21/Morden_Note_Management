@@ -68,6 +68,9 @@ public class CategoryServiceImpl implements CategoryService {
         if (!existingCategory.getDescription().equals(description)) {
             existingCategory.setDescription(description);
         }
+        if (!existingCategory.getUsername().equals(username)) {
+            throw new UserNotFoundException("User with username " + username + " is not authorized to edit this category");
+        }
 
         Category updatedCategory = categoryRepository.save(existingCategory);
 

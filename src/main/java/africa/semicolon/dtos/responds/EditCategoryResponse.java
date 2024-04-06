@@ -4,7 +4,7 @@ import lombok.Data;
 
 @Data
 public class EditCategoryResponse {
-    private String id;
+    private String categoryId;
     private String description;
     private String username;
 }

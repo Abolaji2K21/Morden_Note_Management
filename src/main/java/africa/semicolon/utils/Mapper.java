@@ -55,7 +55,7 @@ public class Mapper {
     }
     public static CreateCategoryResponse mapToCreateCategoryResponse(Category category) {
         CreateCategoryResponse response = new CreateCategoryResponse();
-        response.setId(category.getId());
+        response.setCategoryId(category.getId());
         response.setDescription(category.getDescription());
         response.setUsername(category.getUsername());
         return response;
@@ -63,7 +63,7 @@ public class Mapper {
 
     public static EditCategoryResponse mapToEditCategoryResponse(Category category) {
         EditCategoryResponse response = new EditCategoryResponse();
-        response.setId(category.getId());
+        response.setCategoryId(category.getId());
         response.setDescription(category.getDescription());
         response.setUsername(category.getUsername());
         return response;
