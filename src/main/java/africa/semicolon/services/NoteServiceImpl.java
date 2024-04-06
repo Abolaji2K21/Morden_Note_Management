@@ -127,6 +127,9 @@ public class NoteServiceImpl implements NoteService {
 
     private void validate(CreateNoteRequest createNoteRequest) {
         String username = createNoteRequest.getUsername();
+        if (username == null || username.isEmpty()) {
+            throw new BigNoteManagementException("Username cannot be null or empty");
+        }
         String noteTitle = createNoteRequest.getTitle();
         boolean noteExistsForUser = noteRepository.existsBy(username, noteTitle);
         if (noteExistsForUser) {
