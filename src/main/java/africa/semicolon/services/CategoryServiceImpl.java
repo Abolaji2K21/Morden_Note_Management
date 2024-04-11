@@ -111,7 +111,7 @@ public class CategoryServiceImpl implements CategoryService {
         if (note.getId() == null) {
             note = noteRepository.save(note);
         }
-
+//        note.setCategory(category);
         category.getNotes().add(note);
 
         categoryRepository.save(category);

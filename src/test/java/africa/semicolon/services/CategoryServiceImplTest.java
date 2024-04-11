@@ -204,7 +204,7 @@ public class CategoryServiceImplTest {
 
         assertEquals("HappyCategories", categoryResponse.getDescription());
         assertEquals("penisup", categoryResponse.getUsername());
-        assertTrue(categoryRepository.findById(categoryResponse.getId()).isPresent());
+        assertTrue(categoryRepository.findById(categoryResponse.getCategoryId()).isPresent());
 
         Category category = categoryRepository.findByDescription("HappyCategories").get();
         assertTrue(category.getNotes().contains(note));

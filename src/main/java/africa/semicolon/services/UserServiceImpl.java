@@ -62,9 +62,9 @@ public class UserServiceImpl implements UserService {
         if (user == null) {
             throw new UserNotFoundException("User with username " + username + " not found");
         } else {
-//            user.setLoggedIn(false);
+            user.setLoggedIn(false);
             userRepository.save(user);
-            return new LogoutUserResponse(user.getId(), user.getUsername(),false);
+            return new LogoutUserResponse(user.getId(), user.getUsername(),user.isLoggedIn());
         }
     }
 
