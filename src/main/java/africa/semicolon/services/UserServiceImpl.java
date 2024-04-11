@@ -1,5 +1,7 @@
 package africa.semicolon.services;
 
+import africa.semicolon.dtos.requests.UpdateUserRequest;
+import africa.semicolon.dtos.responds.UpdateUserResponse;
 import africa.semicolon.noteException.BigNoteManagementException;
 import africa.semicolon.noteException.InvalidPassCodeException;
 import africa.semicolon.noteException.UserExistsException;
@@ -15,9 +17,11 @@ import africa.semicolon.data.repositories.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.Optional;
 
 import static africa.semicolon.utils.Mapper.map;
+import static africa.semicolon.utils.Mapper.mapUpdateUserResponse;
 
 @Service
 public class UserServiceImpl implements UserService {
@@ -75,6 +79,21 @@ public class UserServiceImpl implements UserService {
             throw new UserNotFoundException("User with username " + username + " not found");
         }
         return user;
+    }
+
+    @Override
+    public UpdateUserResponse updateUserProfile(UpdateUserRequest request) {
+        String userId = request.getUserId();
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new UserNotFoundException("User with ID " + userId + " not found"));
+
+        user.setFirstName(request.getFirstname());
+        user.setLastName(request.getLastname());
+        user.setUsername(request.getUsername());
+        user.setDateUpdated(LocalDateTime.now());
+        userRepository.save(user);
+        return mapUpdateUserResponse(user);
+
     }
 
 

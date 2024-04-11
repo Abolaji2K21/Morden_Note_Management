@@ -1,6 +1,4 @@
 package africa.semicolon.utils;
-
-import africa.semicolon.data.model.Category;
 import africa.semicolon.data.model.Note;
 import africa.semicolon.data.model.User;
 import africa.semicolon.dtos.requests.CreateNoteRequest;
@@ -53,19 +51,30 @@ public class Mapper {
         response.setNewContent(updatedNote.getContent());
         return response;
     }
-    public static CreateCategoryResponse mapToCreateCategoryResponse(Category category) {
-        CreateCategoryResponse response = new CreateCategoryResponse();
-        response.setCategoryId(category.getId());
-        response.setDescription(category.getDescription());
-        response.setUsername(category.getUsername());
-        return response;
-    }
 
-    public static EditCategoryResponse mapToEditCategoryResponse(Category category) {
-        EditCategoryResponse response = new EditCategoryResponse();
-        response.setCategoryId(category.getId());
-        response.setDescription(category.getDescription());
-        response.setUsername(category.getUsername());
+    public static UpdateUserResponse mapUpdateUserResponse(User user) {
+        UpdateUserResponse response = new UpdateUserResponse();
+        response.setUserId(user.getId());
+        response.setUsername(user.getUsername());
+        response.setFirstname(user.getFirstName());
+        response.setLastname(user.getLastName());
+        response.setDateUpdated(user.getDateUpdated().toString());
+        response.setLoggedIn(user.isLoggedIn());
         return response;
     }
+//    public static CreateCategoryResponse mapToCreateCategoryResponse(Category category) {
+//        CreateCategoryResponse response = new CreateCategoryResponse();
+//        response.setCategoryId(category.getId());
+//        response.setDescription(category.getDescription());
+//        response.setUsername(category.getUsername());
+//        return response;
+//    }
+//
+//    public static EditCategoryResponse mapToEditCategoryResponse(Category category) {
+//        EditCategoryResponse response = new EditCategoryResponse();
+//        response.setCategoryId(category.getId());
+//        response.setDescription(category.getDescription());
+//        response.setUsername(category.getUsername());
+//        return response;
+//    }
 }

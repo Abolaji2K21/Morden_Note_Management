@@ -1,22 +1,28 @@
 package africa.semicolon.services;
 
+import africa.semicolon.data.model.User;
 import africa.semicolon.data.repositories.UserRepository;
 import africa.semicolon.dtos.requests.LoginUserRequest;
 import africa.semicolon.dtos.requests.LogoutUserRequest;
 import africa.semicolon.dtos.requests.RegisterUserRequest;
+import africa.semicolon.dtos.requests.UpdateUserRequest;
 import africa.semicolon.dtos.responds.LoginUserResponse;
 import africa.semicolon.dtos.responds.LogoutUserResponse;
+import africa.semicolon.dtos.responds.RegisterUserResponse;
+import africa.semicolon.dtos.responds.UpdateUserResponse;
+
 import africa.semicolon.noteException.BigNoteManagementException;
+import africa.semicolon.noteException.UserNotFoundException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
-import static org.bson.assertions.Assertions.assertNotNull;
+import java.util.Optional;
+
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
 import static org.junit.jupiter.api.Assertions.*;
-import static org.junit.jupiter.api.Assertions.assertThrows;
 
 @SpringBootTest
 class UserServiceImplTest {
@@ -43,7 +49,7 @@ class UserServiceImplTest {
 
         assertThat(userRepository.count(), is(0L));
         userService.register(registerRequest);
-        assertThat(userRepository.count(), is(1L));
+        assertThat(userRepository.count(), is(1L ));
 
     }
 
@@ -101,6 +107,7 @@ class UserServiceImplTest {
         LoginUserRequest loginRequest = new LoginUserRequest();
         loginRequest.setUsername("PenIsUp");
         loginRequest.setPassword("Holes");
+
         LoginUserResponse loginResponse = userService.login(loginRequest);
         assertThat(loginResponse.getUsername(), is("penisup"));
 
@@ -167,7 +174,6 @@ class UserServiceImplTest {
         assertThat(userRepository.count(), is(1L));
 
     }
-
     @Test
     void testRegisterWithEmptyUsername() {
         RegisterUserRequest registerRequest = new RegisterUserRequest();
@@ -199,5 +205,47 @@ class UserServiceImplTest {
 
         assertThrows(BigNoteManagementException.class, () -> userService.login(loginRequest));
     }
+
+    @Test
+    void testUpdateUserProfile() {
+        RegisterUserRequest registerRequest = new RegisterUserRequest();
+        registerRequest.setFirstname("PenIs");
+        registerRequest.setLastname("Up");
+        registerRequest.setUsername("PenIsUp");
+        registerRequest.setPassword("Holes");
+        RegisterUserResponse userResponse = userService.register(registerRequest);
+
+        UpdateUserRequest updateRequest = new UpdateUserRequest();
+        updateRequest.setUserId(userResponse.getId());
+        updateRequest.setFirstname("Rename");
+        updateRequest.setLastname("Pen");
+        updateRequest.setUsername("penisup");
+
+        UpdateUserResponse response = userService.updateUserProfile(updateRequest);
+
+        Optional<User> updatedUserOptional = userRepository.findById(userResponse.getId());
+        assertTrue(updatedUserOptional.isPresent());
+        User updatedUser = updatedUserOptional.get();
+
+        assertEquals("penisup", response.getUsername());
+        assertEquals("Rename", response.getFirstname());
+        assertEquals("Pen", response.getLastname());
+        assertEquals(updatedUser.getId(), response.getUserId());
+        assertEquals(updatedUser.getUsername(), response.getUsername());
+        assertEquals(updatedUser.getFirstName(), response.getFirstname());
+        assertEquals(updatedUser.getLastName(), response.getLastname());
+    }
+
+    @Test
+    void testUpdateUserProfile_UserNotFound() {
+        UpdateUserRequest updateRequest = new UpdateUserRequest();
+        updateRequest.setUserId("nonExistingUserId");
+        updateRequest.setFirstname("Rename");
+        updateRequest.setLastname("Pen");
+        updateRequest.setUsername("penisup");
+
+        assertThrows(UserNotFoundException.class, () -> userService.updateUserProfile(updateRequest));
+    }
+
 
 }

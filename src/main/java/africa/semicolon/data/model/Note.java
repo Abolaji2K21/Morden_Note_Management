@@ -18,13 +18,13 @@ public class Note {
     private String userId;
     private LocalDateTime dateTimeUpdated;
     @DBRef
-    private Category category;
-    @Override
-    public String toString() {
-        return "Note {" +
-                "id=" + id + ", title=" + title + ", content=" + content + ", dateTimeCreated=" + dateTimeCreated + ", userId=" + userId + ", dateTimeUpdated=" + dateTimeUpdated + ", category=" + category + "      " +
-                "    }";
-    }
+    private String category;
+//    @Override
+//    public String toString() {
+//        return "Note {" +
+//                "id=" + id + ", title=" + title + ", content=" + content + ", dateTimeCreated=" + dateTimeCreated + ", userId=" + userId + ", dateTimeUpdated=" + dateTimeUpdated + ", category=" + category + "      " +
+//                "    }";
+//    }
 
 
 }

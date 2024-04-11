@@ -4,9 +4,11 @@ package africa.semicolon.controllers;
 import africa.semicolon.dtos.requests.LoginUserRequest;
 import africa.semicolon.dtos.requests.LogoutUserRequest;
 import africa.semicolon.dtos.requests.RegisterUserRequest;
+import africa.semicolon.dtos.requests.UpdateUserRequest;
 import africa.semicolon.dtos.responds.ApiResponse;
 import africa.semicolon.dtos.responds.LoginUserResponse;
 import africa.semicolon.dtos.responds.RegisterUserResponse;
+import africa.semicolon.dtos.responds.UpdateUserResponse;
 import africa.semicolon.noteException.BigNoteManagementException;
 import africa.semicolon.services.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -54,6 +56,17 @@ public class UserController {
         }
     }
 
+    @PatchMapping("/update")
+    public ResponseEntity<?> updateUserProfile(@RequestBody UpdateUserRequest request) {
+
+        try{
+            UpdateUserResponse result = userService.updateUserProfile(request);
+            return new ResponseEntity<>(new ApiResponse(true,result), CREATED);
+        }
+        catch (BigNoteManagementException message){
+            return new ResponseEntity<>(new ApiResponse(false, message.getMessage()), BAD_REQUEST);
+        }
+    }
 
 
 }
