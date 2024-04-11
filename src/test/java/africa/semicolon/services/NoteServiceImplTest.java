@@ -1,13 +1,11 @@
 package africa.semicolon.services;
 
 import africa.semicolon.data.model.Note;
-import africa.semicolon.data.model.User;
 import africa.semicolon.data.repositories.NoteRepository;
 import africa.semicolon.data.repositories.UserRepository;
 import africa.semicolon.dtos.requests.*;
 import africa.semicolon.dtos.responds.LoginUserResponse;
 import africa.semicolon.noteException.BigNoteManagementException;
-import africa.semicolon.noteException.UserNotFoundException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -46,7 +44,7 @@ public class NoteServiceImplTest {
         createNoteRequest.setTitle("AboutHoles");
         createNoteRequest.setContent("What to do when the hole is right");
 
-        assertThrows(BigNoteManagementException.class, () -> noteService.writeNote(createNoteRequest));
+        assertThrows(BigNoteManagementException.class, () -> noteService.addNote(createNoteRequest));
     }
 
     @Test
@@ -62,7 +60,7 @@ public class NoteServiceImplTest {
         createNoteRequest.setUsername("penisup");
         createNoteRequest.setTitle("AboutHoles");
         createNoteRequest.setContent("What to do when the hole is right");
-        assertThrows(BigNoteManagementException.class, () -> noteService.writeNote(createNoteRequest));
+        assertThrows(BigNoteManagementException.class, () -> noteService.addNote(createNoteRequest));
 
 
     }
@@ -87,7 +85,7 @@ public class NoteServiceImplTest {
         createNoteRequest.setUsername("penisup");
         createNoteRequest.setTitle("AboutHoles");
         createNoteRequest.setContent("What to do when the hole is right");
-        noteService.writeNote(createNoteRequest);
+        noteService.addNote(createNoteRequest);
 
         Note savedNote = noteRepository.findBy("AboutHoles");
         assertEquals("AboutHoles", savedNote.getTitle());
@@ -151,7 +149,7 @@ public class NoteServiceImplTest {
         createNoteRequest.setUsername("penisup");
         createNoteRequest.setTitle("AboutHoles");
         createNoteRequest.setContent("What to do when the hole is right");
-        noteService.writeNote(createNoteRequest);
+        noteService.addNote(createNoteRequest);
 
         EditNoteRequest editNoteRequest = new EditNoteRequest();
         editNoteRequest.setUsername("penisup");
@@ -209,7 +207,7 @@ public class NoteServiceImplTest {
         createNoteRequest.setUsername("penisup");
         createNoteRequest.setTitle("AboutHoles");
         createNoteRequest.setContent("What to do when the hole is right");
-        noteService.writeNote(createNoteRequest);
+        noteService.addNote(createNoteRequest);
 
         DeleteNoteRequest deleteNoteRequest = new DeleteNoteRequest();
         deleteNoteRequest.setUsername("penisup");
@@ -240,7 +238,7 @@ public class NoteServiceImplTest {
         createNoteRequest.setUsername("penisup");
         createNoteRequest.setTitle("AboutHoles");
         createNoteRequest.setContent("What to do when the hole is right");
-        noteService.writeNote(createNoteRequest);
+        noteService.addNote(createNoteRequest);
 
         DeleteNoteRequest deleteNoteRequest = new DeleteNoteRequest();
         deleteNoteRequest.setUsername("penisDown");

@@ -11,20 +11,16 @@ import java.time.LocalDateTime;
 @Document("Notes")
 public class Note {
     @Id
-    private String id;
+    private String noteId;
+    private String userId;
+    private String username;
+
+
     private String title;
     private String content;
-    private LocalDateTime dateTimeCreated;
-    private String userId;
-    private LocalDateTime dateTimeUpdated;
-    @DBRef
     private String category;
-//    @Override
-//    public String toString() {
-//        return "Note {" +
-//                "id=" + id + ", title=" + title + ", content=" + content + ", dateTimeCreated=" + dateTimeCreated + ", userId=" + userId + ", dateTimeUpdated=" + dateTimeUpdated + ", category=" + category + "      " +
-//                "    }";
-//    }
 
+    private LocalDateTime dateTimeCreated;
+    private LocalDateTime dateTimeUpdated;
 
 }

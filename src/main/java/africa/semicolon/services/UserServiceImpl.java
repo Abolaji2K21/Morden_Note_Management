@@ -18,10 +18,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
-import java.util.Optional;
 
-import static africa.semicolon.utils.Mapper.map;
-import static africa.semicolon.utils.Mapper.mapUpdateUserResponse;
+import static africa.semicolon.utils.UserMapper.map;
+import static africa.semicolon.utils.UserMapper.mapUpdateUserResponse;
 
 @Service
 public class UserServiceImpl implements UserService {

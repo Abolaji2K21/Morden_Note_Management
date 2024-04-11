@@ -4,6 +4,11 @@ import lombok.Data;
 
 @Data
 public class EditNoteResponse {
-    private String newTitle;
-    private String newContent;
+    private String noteId;
+    private String dateUpdated;
+    private String title;
+    private String content;
+    private String category;
+
+
 }

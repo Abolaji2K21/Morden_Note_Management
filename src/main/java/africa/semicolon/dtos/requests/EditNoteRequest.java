@@ -6,5 +6,9 @@ import lombok.Data;
 public class EditNoteRequest {
     private String title;
     private String content;
+    private String category;
+    private String noteId;
+    private String userId;
     private String username;
+
 }

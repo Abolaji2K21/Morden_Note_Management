@@ -5,9 +5,17 @@ import africa.semicolon.data.model.User;
 import org.springframework.data.mongodb.repository.MongoRepository;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
+import java.util.Optional;
+
 @Repository
 public interface NoteRepository extends MongoRepository<Note, String> {
-    Boolean existsBy(String Username, String Title);
-    Note findBy(String username);
+    Boolean existsByTitle(String title);
+    Note findNoteByNoteIdAndUserId(String NoteId, String userId);
+    List<Note> findAllByUserIdAndCategory(String userId, String category);
+    List<Note> findAllByUsername(String username);
+    Optional<Note> findByUserId(String userId);
+    Optional<Note> findByCategory(String category);
+
 
 }

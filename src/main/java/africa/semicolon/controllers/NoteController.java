@@ -31,7 +31,7 @@ public class NoteController {
     @PostMapping("/create_note")
     public ResponseEntity<?> writeNote(@RequestBody CreateNoteRequest createNoteRequest) {
         try {
-            CreateNoteResponse result = noteService.writeNote(createNoteRequest);
+            CreateNoteResponse result = noteService.addNote(createNoteRequest);
             return new ResponseEntity<>(new ApiResponse(true, result), CREATED);
         } catch (BigNoteManagementException message) {
             return new ResponseEntity<>(new ApiResponse(false, message.getMessage()), BAD_REQUEST);

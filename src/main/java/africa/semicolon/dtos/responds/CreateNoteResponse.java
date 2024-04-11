@@ -8,4 +8,5 @@ public class CreateNoteResponse {
     private String title;
     private String content;
     private String dateCreated;
+    private String Category;
 }

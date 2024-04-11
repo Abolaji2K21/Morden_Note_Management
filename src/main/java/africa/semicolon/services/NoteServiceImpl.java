@@ -18,123 +18,151 @@ import org.springframework.stereotype.Service;
 
 import java.util.Optional;
 
-import static africa.semicolon.utils.Mapper.*;
-
 @Service
 public class NoteServiceImpl implements NoteService {
 
     @Autowired
     private NoteRepository noteRepository;
+
     @Autowired
     private UserRepository userRepository;
+
     @Autowired
     private UserService userService;
 
     @Override
-    public CreateNoteResponse writeNote(CreateNoteRequest createNoteRequest) {
-        String username = createNoteRequest.getUsername();
-        if (!userService.isUserRegistered(username)) {
-            throw new BigNoteManagementException("User with username " + username + " is not registered");
-        }
-
-        if (!userService.isUserLoggedIn(username)) {
-
-            throw new BigNoteManagementException("User with username " + username + " is not logged in");
-        }
-            User user = findUserBy(username);
-
-
-            Note newNote = map(createNoteRequest);
-            validate(createNoteRequest);
-            newNote.setUserId(user.getId());
-            Note savedNote = noteRepository.save(newNote);
-            return map(savedNote);
+    public CreateNoteResponse createNoteForUser(CreateNoteRequest createNoteRequest) {
+        String userId = createNoteRequest.getUserId();
+        User user = findUserBy(userId);
+        checkUserStatus(user.getUsername());
+        Note newNote = mapNote(createNoteRequest, user);
+        validateCreateNoteRequest(createNoteRequest);
+        Note savedNote = noteRepository.save(newNote);
+        return mapCreateNoteResponse(savedNote);
     }
-
+    
     @Override
-    public EditNoteResponse editNote(EditNoteRequest editNoteRequest) {
-        String username = editNoteRequest.getUsername();
-        if (!userService.isUserRegistered(username)) {
-            throw new BigNoteManagementException("User with username " + username + " is not registered");
+    public EditNoteResponse editNoteForUser(EditNoteRequest editNoteRequest) {
+        String userId = editNoteRequest.getUserId();
+        User user = findUserBy(userId);
+        checkUserStatus(user.getUsername());
+        Note existingNote = mapNoteForEdit(editNoteRequest, user);
+        updateNoteWithEditRequest(editNoteRequest, existingNote);
+        return mapEditNoteResponse(existingNote);
+    }
+    @Override
+    public DeleteNoteResponse deleteNoteForUser(DeleteNoteRequest deleteNoteRequest) {
+        String userId = deleteNoteRequest.getUserId();
+        User user = findUserBy(userId);
+        checkUserStatus(user.getUsername());
+
+        String noteId = deleteNoteRequest.getNoteId();
+        Optional<Note> existingNoteOptional = noteRepository.findById(noteId);
+        if (!existingNoteOptional.isPresent()) {
+            throw new NoteNotFoundExceptionException("Note with ID " + noteId + " not found");
         }
 
-        if (!userService.isUserLoggedIn(username)) {
-            throw new BigNoteManagementException("User with username " + username + " is not logged in");
-        }
-        Note existingNote = findNoteBy(editNoteRequest.getTitle());
-        User user = findUserBy(editNoteRequest.getUsername());
+        Note existingNote = existingNoteOptional.get();
         if (!existingNote.getUserId().equals(user.getId())) {
-            throw new UserNotFoundException("You are not authorized to edit this note");
-        }
-
-        mapEditNoteRequest(editNoteRequest, existingNote);
-        Note updatedNote = noteRepository.save(existingNote);
-
-        return mapEditNoteResponse(updatedNote);
-    }
-
-//    private void checkStatus(String editNoteRequest) {
-//        String username = editNoteRequest;
-//        if (!userService.isUserRegistered(username)) {
-//            throw new BigNoteManagementException("User with username " + username + " is not registered");
-//        }
-//
-//        if (!userService.isUserLoggedIn(username)) {
-//            throw new BigNoteManagementException("User with username " + username + " is not logged in");
-//        }
-//    }
-
-
-    public Note findNoteBy(String username) {
-        Note note = noteRepository.findBy(username);
-        if (note == null) {
-            throw new NoteNotFoundExceptionException("Note not found for" +
-                    " user: " + username);
-        }
-        return note;
-    }
-
-
-    @Override
-    public User findUserBy(String username) {
-        User user = userRepository.findByUsername(username);
-        if (user == null) {
-            throw new UserNotFoundException("Username not found");
-        }
-        return user;
-    }
-
-    @Override
-    public DeleteNoteResponse deleteNote(DeleteNoteRequest deleteNoteRequest) {
-        String username = deleteNoteRequest.getUsername();
-        if (!userService.isUserRegistered(username)) {
-            throw new BigNoteManagementException("User with username " + username + " is not registered");
-        }
-
-        if (!userService.isUserLoggedIn(username)) {
-            throw new BigNoteManagementException("User with username " + username + " is not logged in");
-        }        Note existingNote = findNoteBy(deleteNoteRequest.getTitle());
-        User user = findUserBy(deleteNoteRequest.getUsername());
-        if (!existingNote.getUserId().equals(user.getId())) {
-            throw new UserNotFoundException("You are not authorized to delete this note");
+            throw new BigNoteManagementException("You are not authorized to delete this note");
         }
 
         noteRepository.delete(existingNote);
 
         return new DeleteNoteResponse();
-
     }
 
-    private void validate(CreateNoteRequest createNoteRequest) {
-        String username = createNoteRequest.getUsername();
-        if (username == null || username.isEmpty()) {
+    @Override
+    public Optional<Note> getNoteById(String noteId) {
+        return noteRepository.findById(noteId);
+    }
+
+    @Override
+    public Optional<Note> getAllNotesByUserId(String userId) {
+        User user = userRepository.findUserById(userId);
+        if (user == null) {
+            throw new UserNotFoundException("User not found with ID: " + userId);
+        }
+        return noteRepository.findByUserId(userId);
+    }
+
+    @Override
+    public User findUserBy(String username) {
+        User user = userRepository.findByUsername(username);
+        if (user == null) {
+            throw new UserNotFoundException("User not found with username: " + username);
+        }
+        return user;
+    }
+
+    private void validateCreateNoteRequest(CreateNoteRequest createNoteRequest) {
+        String userId = createNoteRequest.getUserId();
+        User user = findUserBy(userId);
+        if (user.getUsername() == null || user.getUsername().isEmpty()) {
             throw new BigNoteManagementException("Username cannot be null or empty");
         }
+
         String noteTitle = createNoteRequest.getTitle();
-        boolean noteExistsForUser = noteRepository.existsBy(username, noteTitle);
+        boolean noteExistsForUser = noteRepository.existsByTitle(noteTitle);
         if (noteExistsForUser) {
-            throw new BigNoteManagementException("Note already exists1");
+            throw new BigNoteManagementException("Note already exists");
         }
     }
+
+    private void checkUserStatus(String username) {
+        if (!userService.isUserRegistered(username)) {
+            throw new BigNoteManagementException("User with username " + username + " is not registered");
+        }
+
+        if (!userService.isUserLoggedIn(username)) {
+            throw new BigNoteManagementException("User with username " + username + " is not logged in");
+        }
+    }
+
+    private static CreateNoteResponse mapCreateNoteResponse(Note savedNote) {
+        CreateNoteResponse response = new CreateNoteResponse();
+        response.setNoteId(savedNote.getNoteId());
+        response.setTitle(savedNote.getTitle());
+        response.setContent(savedNote.getContent());
+        return response;
+    }
+
+    private static Note mapNote(CreateNoteRequest createNoteRequest, User user) {
+        Note newNote = new Note();
+        newNote.setTitle(createNoteRequest.getTitle());
+        newNote.setContent(createNoteRequest.getContent());
+        newNote.setUserId(user.getId());
+        return newNote;
+    }
+
+    private EditNoteResponse mapEditNoteResponse(Note existingNote) {
+        Note updatedNote = noteRepository.save(existingNote);
+        EditNoteResponse response = new EditNoteResponse();
+        response.setNoteId(updatedNote.getNoteId());
+        response.setTitle(updatedNote.getTitle());
+        response.setContent(updatedNote.getContent());
+        return response;
+    }
+
+    private static void updateNoteWithEditRequest(EditNoteRequest editNoteRequest, Note existingNote) {
+        existingNote.setTitle(editNoteRequest.getTitle());
+        existingNote.setContent(editNoteRequest.getContent());
+    }
+
+    private Note mapNoteForEdit(EditNoteRequest editNoteRequest, User user) {
+        String noteId = editNoteRequest.getNoteId();
+        Optional<Note> existingNoteOptional = noteRepository.findById(noteId);
+        if (!existingNoteOptional.isPresent()) {
+            throw new NoteNotFoundExceptionException("Note with ID " + noteId + " not found");
+        }
+
+        Note existingNote = existingNoteOptional.get();
+        if (!existingNote.getUserId().equals(user.getId())) {
+            throw new BigNoteManagementException("You are not authorized to edit this note");
+        }
+        return existingNote;
+    }
+
+
 
 }

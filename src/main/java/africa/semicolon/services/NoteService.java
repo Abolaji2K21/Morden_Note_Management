@@ -7,23 +7,27 @@ import africa.semicolon.data.model.User;
 import africa.semicolon.dtos.requests.CreateNoteRequest;
 import africa.semicolon.dtos.requests.DeleteNoteRequest;
 import africa.semicolon.dtos.requests.EditNoteRequest;
-import africa.semicolon.dtos.requests.LoginUserRequest;
 import africa.semicolon.dtos.responds.CreateNoteResponse;
 import africa.semicolon.dtos.responds.DeleteNoteResponse;
 import africa.semicolon.dtos.responds.EditNoteResponse;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+import java.util.Optional;
+
 @Service
 public interface NoteService {
-    CreateNoteResponse writeNote (CreateNoteRequest createNoteRequest) ;
+    CreateNoteResponse createNoteForUser(CreateNoteRequest createNoteRequest);
 
-    EditNoteResponse editNote(EditNoteRequest editNoteRequest);
+    EditNoteResponse editNoteForUser(EditNoteRequest editNoteRequest);
 
-    Note findNoteBy(String username);
+    DeleteNoteResponse deleteNoteForUser(DeleteNoteRequest deleteNoteRequest);
+
+    Optional<Note> getNoteById(String noteId);
+
+    Optional<Note> getAllNotesByUserId(String userId);
 
     User findUserBy(String username);
-
-    DeleteNoteResponse deleteNote(DeleteNoteRequest deleteNoteRequest);
 
 
 }
