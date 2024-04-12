@@ -293,6 +293,17 @@ class NoteControllerTest {
         assertIsSuccessful(responseEntity, false);
     }
 
+    @Test
+    void testGetAllNotesByCategory_isSuccessful_isFalse() {
+        ResponseEntity<?> responseEntity = noteController.getAllNotesByCategory("invalidUserId", "DarkestHourOfLove");
+        assertIsSuccessful(responseEntity, false);
+    }
+
+    @Test
+    void testGetAllNotesByUserId_isSuccessful_is_false() {
+        ResponseEntity<?> responseEntity = noteController.getAllNotesByUserId("invalidUserId");
+        assertIsSuccessful(responseEntity, false);
+    }
 
 
     private void assertIsSuccessful(ResponseEntity<?> response, boolean expected) {
