@@ -1,7 +1,6 @@
 package africa.semicolon.controllers;
 
 import africa.semicolon.data.model.Note;
-import africa.semicolon.data.model.User;
 import africa.semicolon.dtos.requests.CreateNoteRequest;
 import africa.semicolon.dtos.requests.DeleteNoteRequest;
 import africa.semicolon.dtos.requests.EditNoteRequest;
@@ -11,12 +10,11 @@ import africa.semicolon.dtos.responds.DeleteNoteResponse;
 import africa.semicolon.dtos.responds.EditNoteResponse;
 import africa.semicolon.noteException.BigNoteManagementException;
 import africa.semicolon.services.NoteService;
-import africa.semicolon.services.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
 import java.util.Optional;
 
 import static org.springframework.http.HttpStatus.*;
@@ -26,8 +24,6 @@ import static org.springframework.http.HttpStatus.*;
 public class NoteController {
     @Autowired
     private NoteService noteService;
-    @Autowired
-    private UserService userService;
 
 
     @PostMapping("/create_note")
@@ -72,15 +68,19 @@ public class NoteController {
 
     }
 
-        @GetMapping("/users/{username}")
-    public ResponseEntity<?> findUserByUsername(@RequestBody String userId) {
+    @GetMapping("/getAllByCategory/{userId}/{category}")
+    public ResponseEntity<?> getAllContactsByCategory(@PathVariable String userId, @PathVariable String category) {
+
         try {
-            User user = userService.findUserBy(userId);
-            return new ResponseEntity<>(new ApiResponse(true, user), CREATED);
+            List<Note> result = noteService.getAllNoteByCategory(userId, category);
+            return !result.isEmpty() ?
+                    new ResponseEntity<>(new ApiResponse(true, result),CREATED) :
+                    new ResponseEntity<>(new ApiResponse(false, "No Note found for the given category"), NOT_FOUND);
         } catch (BigNoteManagementException message) {
-            return new ResponseEntity<>(new ApiResponse(false, message.getMessage()), BAD_REQUEST);
+            return new ResponseEntity<>(new ApiResponse(false, message.getMessage()),BAD_REQUEST);
         }
     }
 
 
 }
+
