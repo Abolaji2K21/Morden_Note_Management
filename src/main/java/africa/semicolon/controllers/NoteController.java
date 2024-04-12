@@ -13,13 +13,13 @@ import africa.semicolon.noteException.BigNoteManagementException;
 import africa.semicolon.services.NoteService;
 import africa.semicolon.services.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Optional;
 
-import static org.springframework.http.HttpStatus.BAD_REQUEST;
-import static org.springframework.http.HttpStatus.CREATED;
+import static org.springframework.http.HttpStatus.*;
 
 @RestController
 @RequestMapping("/api/Modern_Note")
@@ -59,17 +59,20 @@ public class NoteController {
             return new ResponseEntity<>(new ApiResponse(false, message.getMessage()), BAD_REQUEST);
         }
     }
-    @GetMapping("/notes/{username}")
-    public ResponseEntity<?> findNoteByUsername(@PathVariable String username) {
+    @GetMapping("/getAllByUserId/{userId}")
+    public ResponseEntity<?> getAllNotesByUserId(@PathVariable String userId) {
         try {
-            Optional<Note> notes = noteService.getAllNotesByUserId(username);
-            return new ResponseEntity<>(new ApiResponse(true, notes), CREATED);
+            Optional<Note> result = noteService.getAllNotesByUserId(userId);
+            return result.isPresent() ?
+                    new ResponseEntity<>(new ApiResponse(true, result.get()), CREATED) :
+                    new ResponseEntity<>(new ApiResponse(false, "No Note found"), NOT_FOUND);
         } catch (BigNoteManagementException message) {
             return new ResponseEntity<>(new ApiResponse(false, message.getMessage()), BAD_REQUEST);
         }
+
     }
 
-    @GetMapping("/users/{username}")
+        @GetMapping("/users/{username}")
     public ResponseEntity<?> findUserByUsername(@RequestBody String userId) {
         try {
             User user = userService.findUserBy(userId);
