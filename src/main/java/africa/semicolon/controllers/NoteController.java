@@ -27,7 +27,7 @@ public class NoteController {
 
 
     @PostMapping("/create_note")
-    public ResponseEntity<?> writeNote(@RequestBody CreateNoteRequest createNoteRequest) {
+    public ResponseEntity<?> createNote(@RequestBody CreateNoteRequest createNoteRequest) {
         try {
             CreateNoteResponse result = noteService.createNoteForUser(createNoteRequest);
             return new ResponseEntity<>(new ApiResponse(true, result), CREATED);
@@ -69,7 +69,7 @@ public class NoteController {
     }
 
     @GetMapping("/getAllByCategory/{userId}/{category}")
-    public ResponseEntity<?> getAllContactsByCategory(@PathVariable String userId, @PathVariable String category) {
+    public ResponseEntity<?> getAllNotesByCategory(@PathVariable String userId, @PathVariable String category) {
 
         try {
             List<Note> result = noteService.getAllNoteByCategory(userId, category);
