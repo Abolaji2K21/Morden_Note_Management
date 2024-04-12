@@ -18,6 +18,8 @@ import org.springframework.stereotype.Service;
 
 import java.util.Optional;
 
+import static africa.semicolon.utils.NoteMapper.*;
+
 @Service
 public class NoteServiceImpl implements NoteService {
 
@@ -134,39 +136,4 @@ public class NoteServiceImpl implements NoteService {
         return existingNote;
     }
 
-    private Note mapNoteForCreate(CreateNoteRequest createNoteRequest, User user) {
-        Note newNote = new Note();
-        newNote.setTitle(createNoteRequest.getTitle());
-        newNote.setContent(createNoteRequest.getContent());
-        newNote.setUserId(user.getId());
-        return newNote;
-    }
-
-    private CreateNoteResponse mapCreateNoteResponse(Note savedNote) {
-        CreateNoteResponse response = new CreateNoteResponse();
-        response.setNoteId(savedNote.getNoteId());
-        response.setTitle(savedNote.getTitle());
-        response.setContent(savedNote.getContent());
-        return response;
-    }
-
-    private EditNoteResponse mapEditNoteResponse(Note updatedNote) {
-        EditNoteResponse response = new EditNoteResponse();
-        response.setNoteId(updatedNote.getNoteId());
-        response.setTitle(updatedNote.getTitle());
-        response.setContent(updatedNote.getContent());
-        return response;
-    }
-
-    private DeleteNoteResponse mapDeleteNoteResponse(Note deletedNote) {
-        DeleteNoteResponse response = new DeleteNoteResponse();
-        response.setNoteId(deletedNote.getNoteId());
-        response.setDeleted(true);
-        return response;
-    }
-
-    private void updateNoteWithEditRequest(EditNoteRequest editNoteRequest, Note existingNote) {
-        existingNote.setTitle(editNoteRequest.getTitle());
-        existingNote.setContent(editNoteRequest.getContent());
-    }
 }
