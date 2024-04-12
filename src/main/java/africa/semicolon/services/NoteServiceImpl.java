@@ -18,8 +18,6 @@ import org.springframework.stereotype.Service;
 
 import java.util.Optional;
 
-import static africa.semicolon.utils.NoteMapper.*;
-
 @Service
 public class NoteServiceImpl implements NoteService {
 
@@ -30,40 +28,36 @@ public class NoteServiceImpl implements NoteService {
     private UserRepository userRepository;
 
     @Autowired
-    private UserService userService;
+    private  UserService userService;
 
     @Override
     public CreateNoteResponse createNoteForUser(CreateNoteRequest createNoteRequest) {
-        String userId = createNoteRequest.getUserId();
-        User user = findUserBy(userId);
+        User user = findUserBy(createNoteRequest.getUserId());
         checkUserStatus(user.getUsername());
-        Note newNote = mapNote(createNoteRequest, user);
         validateCreateNoteRequest(createNoteRequest);
+        Note newNote = mapNoteForCreate(createNoteRequest, user);
         Note savedNote = noteRepository.save(newNote);
         return mapCreateNoteResponse(savedNote);
     }
 
     @Override
     public EditNoteResponse editNoteForUser(EditNoteRequest editNoteRequest) {
-        String userId = editNoteRequest.getUserId();
-        User user = findUserBy(userId);
+        User user = findUserBy(editNoteRequest.getUserId());
         checkUserStatus(user.getUsername());
         Note existingNote = findNoteForEdit(editNoteRequest, user);
         updateNoteWithEditRequest(editNoteRequest, existingNote);
         Note updatedNote = noteRepository.save(existingNote);
-        return mapEditNoteResponseTo(updatedNote);
+        return mapEditNoteResponse(updatedNote);
     }
 
     @Override
     public DeleteNoteResponse deleteNoteForUser(DeleteNoteRequest deleteNoteRequest) {
-        String userId = deleteNoteRequest.getUserId();
-        User user = findUserBy(userId);
+        User user = findUserBy(deleteNoteRequest.getUserId());
         checkUserStatus(user.getUsername());
         Note existingNote = findNoteForDelete(deleteNoteRequest, user);
         noteRepository.delete(existingNote);
-        return new DeleteNoteResponse();
+        return mapDeleteNoteResponse(existingNote);
     }
-
 
     @Override
     public Optional<Note> getNoteById(String noteId) {
@@ -80,10 +74,10 @@ public class NoteServiceImpl implements NoteService {
     }
 
     @Override
-    public User findUserBy(String username) {
-        User user = userRepository.findByUsername(username);
+    public User findUserBy(String userId) {
+        User user = userRepository.findUserById(userId);
         if (user == null) {
-            throw new UserNotFoundException("User not found with username: " + username);
+            throw new UserNotFoundException("User not found with username: " + userId);
         }
         return user;
     }
@@ -96,7 +90,7 @@ public class NoteServiceImpl implements NoteService {
         }
 
         String noteTitle = createNoteRequest.getTitle();
-        boolean noteExistsForUser = noteRepository.existsByTitle(noteTitle);
+        boolean noteExistsForUser = noteRepository.existsByTitleAndUserId(noteTitle, userId);
         if (noteExistsForUser) {
             throw new BigNoteManagementException("Note already exists");
         }
@@ -111,13 +105,10 @@ public class NoteServiceImpl implements NoteService {
             throw new BigNoteManagementException("User with username " + username + " is not logged in");
         }
     }
-    
-
-
 
     private Note findNoteForEdit(EditNoteRequest editNoteRequest, User user) {
         String noteId = editNoteRequest.getNoteId();
-        Optional<Note> existingNoteOptional = noteRepository.findById(noteId);
+        Optional<Note> existingNoteOptional = noteRepository.findNoteByNoteIdAndUserId(noteId, user.getId());
         if (!existingNoteOptional.isPresent()) {
             throw new NoteNotFoundExceptionException("Note with ID " + noteId + " not found");
         }
@@ -131,7 +122,7 @@ public class NoteServiceImpl implements NoteService {
 
     private Note findNoteForDelete(DeleteNoteRequest deleteNoteRequest, User user) {
         String noteId = deleteNoteRequest.getNoteId();
-        Optional<Note> existingNoteOptional = noteRepository.findById(noteId);
+        Optional<Note> existingNoteOptional = noteRepository.findNoteByNoteIdAndUserId(noteId, user.getId());
         if (!existingNoteOptional.isPresent()) {
             throw new NoteNotFoundExceptionException("Note with ID " + noteId + " not found");
         }
@@ -143,7 +134,39 @@ public class NoteServiceImpl implements NoteService {
         return existingNote;
     }
 
+    private Note mapNoteForCreate(CreateNoteRequest createNoteRequest, User user) {
+        Note newNote = new Note();
+        newNote.setTitle(createNoteRequest.getTitle());
+        newNote.setContent(createNoteRequest.getContent());
+        newNote.setUserId(user.getId());
+        return newNote;
+    }
 
+    private CreateNoteResponse mapCreateNoteResponse(Note savedNote) {
+        CreateNoteResponse response = new CreateNoteResponse();
+        response.setNoteId(savedNote.getNoteId());
+        response.setTitle(savedNote.getTitle());
+        response.setContent(savedNote.getContent());
+        return response;
+    }
 
+    private EditNoteResponse mapEditNoteResponse(Note updatedNote) {
+        EditNoteResponse response = new EditNoteResponse();
+        response.setNoteId(updatedNote.getNoteId());
+        response.setTitle(updatedNote.getTitle());
+        response.setContent(updatedNote.getContent());
+        return response;
+    }
 
+    private DeleteNoteResponse mapDeleteNoteResponse(Note deletedNote) {
+        DeleteNoteResponse response = new DeleteNoteResponse();
+        response.setNoteId(deletedNote.getNoteId());
+        response.setDeleted(true);
+        return response;
+    }
+
+    private void updateNoteWithEditRequest(EditNoteRequest editNoteRequest, Note existingNote) {
+        existingNote.setTitle(editNoteRequest.getTitle());
+        existingNote.setContent(editNoteRequest.getContent());
+    }
 }

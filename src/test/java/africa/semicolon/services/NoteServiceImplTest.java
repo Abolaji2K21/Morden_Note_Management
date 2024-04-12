@@ -13,6 +13,8 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
+import java.util.Optional;
+
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
 import static org.junit.jupiter.api.Assertions.*;
@@ -74,27 +76,23 @@ public class NoteServiceImplTest {
         registerRequest.setLastname("Up");
         registerRequest.setUsername("penisup");
         registerRequest.setPassword("Holes");
-        RegisterUserResponse userResponse=userService.register(registerRequest);
-
+        RegisterUserResponse userResponse = userService.register(registerRequest);
         LoginUserRequest loginRequest = new LoginUserRequest();
         loginRequest.setUsername("penisup");
         loginRequest.setPassword("Holes");
         LoginUserResponse loginResponse = userService.login(loginRequest);
         assertThat(loginResponse.getUsername(), is("penisup"));
 
-
         CreateNoteRequest createNoteRequest = new CreateNoteRequest();
         createNoteRequest.setUsername("penisup");
         createNoteRequest.setTitle("AboutHoles");
         createNoteRequest.setContent("What to do when the hole is right");
+        createNoteRequest.setUserId(userResponse.getId());
+        createNoteRequest.setCategory("DarkestHourOfLove");
         CreateNoteResponse noteResponse = noteService.createNoteForUser(createNoteRequest);
 
-        String noteId = noteResponse.getNoteId();
-        String userId = userResponse.getId();
-
-        Note savedNote = noteRepository.findNoteByNoteIdAndUserId(noteId,userId);
-        assertEquals("AboutHoles",savedNote.getTitle());
-
+        Optional<Note> savedNote = noteRepository.findNoteByNoteIdAndUserId(noteResponse.getNoteId(), userResponse.getId());
+        assertEquals("AboutHoles", savedNote.get().getTitle());
     }
 
     @Test
@@ -154,6 +152,8 @@ public class NoteServiceImplTest {
         createNoteRequest.setUsername("penisup");
         createNoteRequest.setTitle("AboutHoles");
         createNoteRequest.setContent("What to do when the hole is right");
+        createNoteRequest.setUserId(userResponse.getId());
+        createNoteRequest.setCategory("DarkestHourOfLove");
         CreateNoteResponse noteResponse = noteService.createNoteForUser(createNoteRequest);
 
         String noteId = noteResponse.getNoteId();
@@ -163,11 +163,13 @@ public class NoteServiceImplTest {
         editNoteRequest.setUsername("penisup");
         editNoteRequest.setTitle("AboutHoles");
         editNoteRequest.setContent("Call the police");
+        editNoteRequest.setUserId(userId);
+        editNoteRequest.setNoteId(noteId);
 
         noteService.editNoteForUser(editNoteRequest);
 
-        Note editedNote = noteRepository.findNoteByNoteIdAndUserId(noteId,userId);
-        assertEquals("Call the police", editedNote.getContent());
+        Optional<Note> editedNote = noteRepository.findNoteByNoteIdAndUserId(noteId,userId);
+        assertEquals("Call the police", editedNote.get().getContent());
 
     }
 
@@ -203,7 +205,7 @@ public class NoteServiceImplTest {
         registerRequest.setLastname("Up");
         registerRequest.setUsername("penisup");
         registerRequest.setPassword("Holes");
-        userService.register(registerRequest);
+        RegisterUserResponse userResponse = userService.register(registerRequest);
 
         LoginUserRequest loginRequest = new LoginUserRequest();
         loginRequest.setUsername("penisup");
@@ -214,17 +216,18 @@ public class NoteServiceImplTest {
         createNoteRequest.setUsername("penisup");
         createNoteRequest.setTitle("AboutHoles");
         createNoteRequest.setContent("What to do when the hole is right");
-        noteService.createNoteForUser(createNoteRequest);
+        createNoteRequest.setUserId(userResponse.getId());
+        createNoteRequest.setCategory("DarkestHourOfLove");
+        CreateNoteResponse noteResponse = noteService.createNoteForUser(createNoteRequest);
+
 
         DeleteNoteRequest deleteNoteRequest = new DeleteNoteRequest();
         deleteNoteRequest.setUsername("penisup");
         deleteNoteRequest.setTitle("AboutHoles");
-
+        deleteNoteRequest.setNoteId(noteResponse.getNoteId());
+        deleteNoteRequest.setUserId(userResponse.getId());
         noteService.deleteNoteForUser(deleteNoteRequest);
-        assertThat(noteRepository.existsByTitle("AboutHoles"), is(false));
-
-
-//        assertNull(noteRepository.findBy("AboutHoles"));
+        assertFalse(noteRepository.existsByTitleAndUserId(deleteNoteRequest.getTitle(), userResponse.getId()));
     }
 
     @Test
@@ -234,7 +237,7 @@ public class NoteServiceImplTest {
         registerRequest.setLastname("Up");
         registerRequest.setUsername("penisup");
         registerRequest.setPassword("Holes");
-        userService.register(registerRequest);
+        RegisterUserResponse userResponse = userService.register(registerRequest);
 
         LoginUserRequest loginRequest = new LoginUserRequest();
         loginRequest.setUsername("penisup");
@@ -245,11 +248,15 @@ public class NoteServiceImplTest {
         createNoteRequest.setUsername("penisup");
         createNoteRequest.setTitle("AboutHoles");
         createNoteRequest.setContent("What to do when the hole is right");
-        noteService.createNoteForUser(createNoteRequest);
+        createNoteRequest.setUserId(userResponse.getId());
+        createNoteRequest.setCategory("DarkestHourOfLove");
+        CreateNoteResponse noteResponse = noteService.createNoteForUser(createNoteRequest);
 
         DeleteNoteRequest deleteNoteRequest = new DeleteNoteRequest();
         deleteNoteRequest.setUsername("penisDown");
         deleteNoteRequest.setTitle("AboutHoles");
+        deleteNoteRequest.setUserId("FakePen");
+        deleteNoteRequest.setNoteId(noteResponse.getNoteId());
         assertThrows(BigNoteManagementException.class, () -> noteService.deleteNoteForUser(deleteNoteRequest));
 
     }
