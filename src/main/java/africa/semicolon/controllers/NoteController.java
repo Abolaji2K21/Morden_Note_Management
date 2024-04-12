@@ -16,6 +16,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Optional;
+
 import static org.springframework.http.HttpStatus.BAD_REQUEST;
 import static org.springframework.http.HttpStatus.CREATED;
 
@@ -31,7 +33,7 @@ public class NoteController {
     @PostMapping("/create_note")
     public ResponseEntity<?> writeNote(@RequestBody CreateNoteRequest createNoteRequest) {
         try {
-            CreateNoteResponse result = noteService.addNote(createNoteRequest);
+            CreateNoteResponse result = noteService.createNoteForUser(createNoteRequest);
             return new ResponseEntity<>(new ApiResponse(true, result), CREATED);
         } catch (BigNoteManagementException message) {
             return new ResponseEntity<>(new ApiResponse(false, message.getMessage()), BAD_REQUEST);
@@ -41,7 +43,7 @@ public class NoteController {
     @PatchMapping("/edit_note")
     public ResponseEntity<?> editNote(@RequestBody EditNoteRequest editNoteRequest) {
         try {
-            EditNoteResponse result = noteService.editNote(editNoteRequest);
+            EditNoteResponse result = noteService.editNoteForUser(editNoteRequest);
             return new ResponseEntity<>(new ApiResponse(true, result), CREATED);
         } catch (BigNoteManagementException message) {
             return new ResponseEntity<>(new ApiResponse(false, message.getMessage()), BAD_REQUEST);
@@ -51,7 +53,7 @@ public class NoteController {
     @DeleteMapping("/delete_note")
     public ResponseEntity<?> deleteNote(@RequestBody DeleteNoteRequest deleteNoteRequest) {
         try {
-            DeleteNoteResponse result = noteService.deleteNote(deleteNoteRequest);
+            DeleteNoteResponse result = noteService.deleteNoteForUser(deleteNoteRequest);
             return new ResponseEntity<>(new ApiResponse(true, result), CREATED);
         } catch (BigNoteManagementException message) {
             return new ResponseEntity<>(new ApiResponse(false, message.getMessage()), BAD_REQUEST);
@@ -60,8 +62,8 @@ public class NoteController {
     @GetMapping("/notes/{username}")
     public ResponseEntity<?> findNoteByUsername(@PathVariable String username) {
         try {
-            Note note = noteService.findNoteBy(username);
-            return new ResponseEntity<>(new ApiResponse(true, note), CREATED);
+            Optional<Note> notes = noteService.getAllNotesByUserId(username);
+            return new ResponseEntity<>(new ApiResponse(true, notes), CREATED);
         } catch (BigNoteManagementException message) {
             return new ResponseEntity<>(new ApiResponse(false, message.getMessage()), BAD_REQUEST);
         }
