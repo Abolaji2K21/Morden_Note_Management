@@ -23,7 +23,7 @@ public interface NoteService {
 
     DeleteNoteResponse deleteNoteForUser(DeleteNoteRequest deleteNoteRequest);
 
-    Optional<Note> getNoteById(String noteId);
+    List<Note> getAllNoteByCategory(String userId, String category);
 
     Optional<Note> getAllNotesByUserId(String userId);
 

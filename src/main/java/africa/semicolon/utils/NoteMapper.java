@@ -2,17 +2,12 @@ package africa.semicolon.utils;
 
 import africa.semicolon.data.model.Note;
 import africa.semicolon.data.model.User;
-import africa.semicolon.data.repositories.NoteRepository;
 import africa.semicolon.dtos.requests.CreateNoteRequest;
-import africa.semicolon.dtos.requests.DeleteNoteRequest;
 import africa.semicolon.dtos.requests.EditNoteRequest;
 import africa.semicolon.dtos.responds.CreateNoteResponse;
 import africa.semicolon.dtos.responds.DeleteNoteResponse;
 import africa.semicolon.dtos.responds.EditNoteResponse;
-import africa.semicolon.noteException.BigNoteManagementException;
-import africa.semicolon.noteException.NoteNotFoundExceptionException;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
+
 
 import java.util.Optional;
 

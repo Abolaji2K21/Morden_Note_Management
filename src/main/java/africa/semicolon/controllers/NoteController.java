@@ -70,9 +70,9 @@ public class NoteController {
     }
 
     @GetMapping("/users/{username}")
-    public ResponseEntity<?> findUserByUsername(@PathVariable String username) {
+    public ResponseEntity<?> findUserByUsername(@RequestBody String userId) {
         try {
-            User user = userService.findUserBy(username);
+            User user = userService.findUserBy(userId);
             return new ResponseEntity<>(new ApiResponse(true, user), CREATED);
         } catch (BigNoteManagementException message) {
             return new ResponseEntity<>(new ApiResponse(false, message.getMessage()), BAD_REQUEST);

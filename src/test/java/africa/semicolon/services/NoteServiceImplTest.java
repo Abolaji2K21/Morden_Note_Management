@@ -8,11 +8,13 @@ import africa.semicolon.dtos.responds.CreateNoteResponse;
 import africa.semicolon.dtos.responds.LoginUserResponse;
 import africa.semicolon.dtos.responds.RegisterUserResponse;
 import africa.semicolon.noteException.BigNoteManagementException;
+import africa.semicolon.noteException.UserNotFoundException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
+import java.util.List;
 import java.util.Optional;
 
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -260,4 +262,96 @@ public class NoteServiceImplTest {
         assertThrows(BigNoteManagementException.class, () -> noteService.deleteNoteForUser(deleteNoteRequest));
 
     }
-}
+
+    @Test
+    void testGetAllNotesByUserId_WhenUserExistsAndHasNotes() {
+        RegisterUserRequest registerRequest = new RegisterUserRequest();
+        registerRequest.setFirstname("PenIs");
+        registerRequest.setLastname("Up");
+        registerRequest.setUsername("penisup");
+        registerRequest.setPassword("Holes");
+        RegisterUserResponse userResponse = userService.register(registerRequest);
+
+        LoginUserRequest loginRequest = new LoginUserRequest();
+        loginRequest.setUsername("penisup");
+        loginRequest.setPassword("Holes");
+        userService.login(loginRequest);
+
+        CreateNoteRequest createNoteRequest = new CreateNoteRequest();
+        createNoteRequest.setUsername("penisup");
+        createNoteRequest.setTitle("AboutHoles");
+        createNoteRequest.setContent("What to do when the hole is right");
+        createNoteRequest.setUserId(userResponse.getId());
+        createNoteRequest.setCategory("DarkestHourOfLove");
+        noteService.createNoteForUser(createNoteRequest);
+
+        Optional<Note> Notes = noteService.getAllNotesByUserId(userResponse.getId());
+        assertTrue(Notes.isPresent());
+    }
+
+    @Test
+    void testGetAllNotesByUserId_WhenUserExistsButHasNoNotes() {
+        RegisterUserRequest registerRequest = new RegisterUserRequest();
+        registerRequest.setFirstname("PenIs");
+        registerRequest.setLastname("Up");
+        registerRequest.setUsername("penisup");
+        registerRequest.setPassword("Holes");
+        RegisterUserResponse userResponse = userService.register(registerRequest);
+
+        Optional<Note> Notes = noteService.getAllNotesByUserId(userResponse.getId());
+        assertTrue(Notes.isEmpty());
+
+    }
+    @Test
+    void testGetAllNotesByUserId_WhenUserDoesNotExist() {
+        assertThrows(UserNotFoundException.class, () -> noteService.getAllNotesByUserId("invalidUserId"));
+
+    }
+    @Test
+    void testGetAllNotesByCategory_WhenUserExistsAndHasNotes() {
+        RegisterUserRequest registerRequest = new RegisterUserRequest();
+        registerRequest.setFirstname("PenIs");
+        registerRequest.setLastname("Up");
+        registerRequest.setUsername("penisup");
+        registerRequest.setPassword("Holes");
+        RegisterUserResponse userResponse = userService.register(registerRequest);
+
+        LoginUserRequest loginRequest = new LoginUserRequest();
+        loginRequest.setUsername("penisup");
+        loginRequest.setPassword("Holes");
+        userService.login(loginRequest);
+
+        CreateNoteRequest createNoteRequest = new CreateNoteRequest();
+        createNoteRequest.setUsername("penisup");
+        createNoteRequest.setTitle("AboutHoles");
+        createNoteRequest.setContent("What to do when the hole is right");
+        createNoteRequest.setUserId(userResponse.getId());
+        createNoteRequest.setCategory("DarkestHourOfLove");
+        noteService.createNoteForUser(createNoteRequest);
+        List<Note> notes = noteService.getAllNoteByCategory(createNoteRequest.getUserId(), createNoteRequest.getCategory());
+        assertEquals(1, notes.size());
+
+    }
+
+    @Test
+    void testGetAllNotesByCategory_WhenUserExistsButHasNoNotes() {
+        RegisterUserRequest registerRequest = new RegisterUserRequest();
+        registerRequest.setFirstname("PenIs");
+        registerRequest.setLastname("Up");
+        registerRequest.setUsername("penisup");
+        registerRequest.setPassword("Holes");
+        RegisterUserResponse userResponse = userService.register(registerRequest);
+        List<Note> notes = noteService.getAllNoteByCategory(userResponse.getId(), "HellNo");
+        assertTrue(notes.isEmpty());
+
+    }
+
+    @Test
+    void testGetAllContactsByCategory_WhenUserDoesNotExist() {
+        assertThrows(UserNotFoundException.class, () -> noteService.getAllNoteByCategory("invalidUserId", "PenIsUpCategory"));
+
+    }
+    }
+
+
+

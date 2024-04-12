@@ -13,9 +13,7 @@ public interface NoteRepository extends MongoRepository<Note, String> {
     Boolean existsByTitleAndUserId(String title, String userId);
     Optional<Note> findNoteByNoteIdAndUserId(String noteId, String userId);
     List<Note> findAllByUserIdAndCategory(String userId, String category);
-    List<Note> findAllByUsername(String username);
     Optional<Note> findByUserId(String userId);
-    Optional<Note> findByCategory(String category);
 
 
 }
