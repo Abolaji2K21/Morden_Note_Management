@@ -49,6 +49,7 @@ public class NoteMapper {
         DeleteNoteResponse response = new DeleteNoteResponse();
         response.setNoteId(deletedNote.getNoteId());
         response.setDeleted(true);
+        response.setUsername(deletedNote.getUsername());
         return response;
     }
 
