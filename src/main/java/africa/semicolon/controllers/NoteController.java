@@ -56,7 +56,7 @@ public class NoteController {
         }
     }
     @GetMapping("/getAllByUserId/{userId}")
-    public ResponseEntity<?> getAllNotesByUserId(@PathVariable String userId) {
+    public ResponseEntity<?> getAllNotesByUserId(@PathVariable(name = "userId") String userId) {
         try {
             Optional<Note> result = noteService.getAllNotesByUserId(userId);
             return  new ResponseEntity<>(new ApiResponse(true, result.get()), OK);

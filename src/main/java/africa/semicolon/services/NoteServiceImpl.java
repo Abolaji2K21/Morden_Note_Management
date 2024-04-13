@@ -23,7 +23,6 @@
     import static africa.semicolon.utils.NoteMapper.*;
 
     @Service
-    @Slf4j
     public class NoteServiceImpl implements NoteService {
 
         @Autowired
@@ -42,7 +41,6 @@
             validateCreateNoteRequest(createNoteRequest);
             Note newNote = mapNoteForCreate(createNoteRequest, user);
             Note savedNote = noteRepository.save(newNote);
-            log.info(" note created {}", savedNote);
             return mapCreateNoteResponse(savedNote);
         }
 
