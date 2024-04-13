@@ -258,9 +258,7 @@ class NoteControllerTest {
         createNoteRequest.setUserId(userId);
         createNoteRequest.setCategory("DarkestHourOfLove");
         ResponseEntity<?> createNoteResponseEntity = noteController.createNote(createNoteRequest);
-
         ResponseEntity<?> getAllNotesResponseEntity = noteController.getAllNotesByCategory(userId, "DarkestHourOfLove");
-
         assertIsSuccessful(getAllNotesResponseEntity, true);
     }
 

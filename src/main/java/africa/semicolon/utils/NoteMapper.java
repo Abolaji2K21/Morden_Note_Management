@@ -7,16 +7,18 @@ import africa.semicolon.dtos.requests.EditNoteRequest;
 import africa.semicolon.dtos.responds.CreateNoteResponse;
 import africa.semicolon.dtos.responds.DeleteNoteResponse;
 import africa.semicolon.dtos.responds.EditNoteResponse;
+import lombok.extern.slf4j.Slf4j;
 
 
 import java.util.Optional;
-
 public class NoteMapper {
     public static Note mapNoteForCreate(CreateNoteRequest createNoteRequest, User user) {
         Note newNote = new Note();
         newNote.setTitle(createNoteRequest.getTitle());
         newNote.setContent(createNoteRequest.getContent());
         newNote.setUserId(user.getId());
+        newNote.setCategory(createNoteRequest.getCategory());
+        newNote.setUsername(createNoteRequest.getUsername());
         return newNote;
     }
 

@@ -1,6 +1,7 @@
 package africa.semicolon.data.model;
 
 import lombok.Data;
+import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.DBRef;
 import org.springframework.data.mongodb.core.mapping.Document;
@@ -20,7 +21,7 @@ public class Note {
     private String content;
     private String category;
 
-    private LocalDateTime dateTimeCreated;
-    private LocalDateTime dateTimeUpdated;
+    private LocalDateTime dateTimeCreated = LocalDateTime.now();
+    private LocalDateTime dateTimeUpdated= LocalDateTime.now();
 
 }

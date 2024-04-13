@@ -12,8 +12,8 @@ import java.util.Optional;
 public interface NoteRepository extends MongoRepository<Note, String> {
     Boolean existsByTitleAndUserId(String title, String userId);
     Optional<Note> findNoteByNoteIdAndUserId(String noteId, String userId);
-    List<Note> findAllByUserIdAndCategory(String userId, String category);
     Optional<Note> findByUserId(String userId);
 
 
+    List<Note> findByUserIdAndCategory(String userId, String category);
 }

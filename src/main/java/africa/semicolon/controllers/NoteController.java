@@ -20,7 +20,7 @@ import java.util.Optional;
 import static org.springframework.http.HttpStatus.*;
 
 @RestController
-@RequestMapping("/api/Modern_Note")
+@RequestMapping("/api/note")
 public class NoteController {
     @Autowired
     private NoteService noteService;
@@ -59,9 +59,7 @@ public class NoteController {
     public ResponseEntity<?> getAllNotesByUserId(@PathVariable String userId) {
         try {
             Optional<Note> result = noteService.getAllNotesByUserId(userId);
-            return result.isPresent() ?
-                    new ResponseEntity<>(new ApiResponse(true, result.get()), CREATED) :
-                    new ResponseEntity<>(new ApiResponse(false, "No Note found"), NOT_FOUND);
+            return  new ResponseEntity<>(new ApiResponse(true, result.get()), OK);
         } catch (BigNoteManagementException message) {
             return new ResponseEntity<>(new ApiResponse(false, message.getMessage()), BAD_REQUEST);
         }
@@ -69,13 +67,10 @@ public class NoteController {
     }
 
     @GetMapping("/getAllByCategory/{userId}/{category}")
-    public ResponseEntity<?> getAllNotesByCategory(@PathVariable String userId, @PathVariable String category) {
-
+    public ResponseEntity<?> getAllNotesByCategory(@PathVariable(name = "userId") String userId, @PathVariable(name = "category") String category) {
         try {
             List<Note> result = noteService.getAllNoteByCategory(userId, category);
-            return !result.isEmpty() ?
-                    new ResponseEntity<>(new ApiResponse(true, result),CREATED) :
-                    new ResponseEntity<>(new ApiResponse(false, "No Note found for the given category"), NOT_FOUND);
+            return new ResponseEntity<>(new ApiResponse(true, result),OK);
         } catch (BigNoteManagementException message) {
             return new ResponseEntity<>(new ApiResponse(false, message.getMessage()),BAD_REQUEST);
         }

@@ -13,6 +13,7 @@
     import africa.semicolon.noteException.BigNoteManagementException;
     import africa.semicolon.noteException.NoteNotFoundExceptionException;
     import africa.semicolon.noteException.UserNotFoundException;
+    import lombok.extern.slf4j.Slf4j;
     import org.springframework.beans.factory.annotation.Autowired;
     import org.springframework.stereotype.Service;
 
@@ -22,6 +23,7 @@
     import static africa.semicolon.utils.NoteMapper.*;
 
     @Service
+    @Slf4j
     public class NoteServiceImpl implements NoteService {
 
         @Autowired
@@ -40,6 +42,7 @@
             validateCreateNoteRequest(createNoteRequest);
             Note newNote = mapNoteForCreate(createNoteRequest, user);
             Note savedNote = noteRepository.save(newNote);
+            log.info(" note created {}", savedNote);
             return mapCreateNoteResponse(savedNote);
         }
 
@@ -69,7 +72,7 @@
                 throw new UserNotFoundException("User not found with ID: " + userId);
             }
 
-            return noteRepository.findAllByUserIdAndCategory(userId, category);
+            return noteRepository.findByUserIdAndCategory(userId, category);
         }
 
         @Override
